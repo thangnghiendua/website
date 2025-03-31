@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hồ sơ trẻ em - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="container">
+        <h1>Hồ sơ trẻ em</h1>
+      </div>
+    </div>
+
+    <!-- Children List Section -->
+    <section class="children-section">
+      <div class="container">
+        <div class="children-container">
+          <!-- Sidebar -->
+          <div th:replace="fragments/sidebar :: sidebar"></div>
+
+          <!-- Main Content -->
+          <div class="main-content">
+            <div th:if="${param.success}" class="alert alert-success">
+              Thao tác thành công!
+            </div>
+
+            <!-- Add Child Button -->
+            <a href="/children/add" class="add-child-btn">
+              <div>
+                <i class="fas fa-plus-circle"></i>
+                <h3>Thêm hồ sơ trẻ em mới</h3>
+                <p>Thêm thông tin trẻ để quản lý lịch tiêm chủng</p>
+              </div>
+            </a>
+
+            <!-- Children Cards -->
+            <div class="children-cards">
+              <div class="child-profile-card" th:each="child : ${children}">
+                <div class="child-profile-header">
+                  <div class="child-profile-avatar">
+                    <img
+                      th:src="${child.avatarUrl != null ? child.avatarUrl : '/images/child-placeholder.png'}"
+                      alt="Avatar"
+                    />
+                  </div>
+                  <h3 th:text="${child.name}">Tên trẻ</h3>
+                </div>
+                <div class="child-profile-body">
+                  <div class="child-profile-info">
+                    <p>
+                      <span>Ngày sinh</span>
+                      <span
+                        th:text="${#dates.format(child.birthDate, 'dd/MM/yyyy')}"
+                        >01/01/2020</span
+                      >
+                    </p>
+                    <p>
+                      <span>Giới tính</span>
+                      <span th:text="${child.gender == 'M' ? 'Nam' : 'Nữ'}"
+                        >Nam</span
+                      >
+                    </p>
+                    <p>
+                      <span>Tuổi</span>
+                      <span th:text="${child.ageDescription}"
+                        >2 tuổi 3 tháng</span
+                      >
+                    </p>
+                    <p>
+                      <span>Mũi tiêm đã thực hiện</span>
+                      <span th:text="${child.completedVaccinations}">5</span>
+                    </p>
+                  </div>
+                  <div class="child-profile-actions">
+                    <a
+                      th:href="@{/children/{id}(id=${child.id})}"
+                      class="btn-outline"
+                      >Xem chi tiết</a
+                    >
+                    <a
+                      th:href="@{/schedule/booking?childId={id}(id=${child.id})}"
+                      class="btn-primary"
+                      >Đặt lịch tiêm</a
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fallback nếu không có dữ liệu từ controller -->
+              <div
+                class="child-profile-card"
+                th:if="${children == null || children.empty}"
+              >
+                <div class="child-profile-header">
+                  <div class="child-profile-avatar">
+                    <img src="/images/child-placeholder.png" alt="Avatar" />
+                  </div>
+                  <h3>Nguyễn Văn An</h3>
+                </div>
+                <div class="child-profile-body">
+                  <div class="child-profile-info">
+                    <p>
+                      <span>Ngày sinh</span>
+                      <span>01/01/2020</span>
+                    </p>
+                    <p>
+                      <span>Giới tính</span>
+                      <span>Nam</span>
+                    </p>
+                    <p>
+                      <span>Tuổi</span>
+                      <span>3 tuổi 2 tháng</span>
+                    </p>
+                    <p>
+                      <span>Mũi tiêm đã thực hiện</span>
+                      <span>5</span>
+                    </p>
+                  </div>
+                  <div class="child-profile-actions">
+                    <a href="/children/1" class="btn-outline">Xem chi tiết</a>
+                    <a href="/schedule/booking?childId=1" class="btn-primary"
+                      >Đặt lịch tiêm</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trung tâm Tiêm chủng - Chăm sóc sức khỏe trẻ em</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block
+      th:replace="fragments/responsive-styles :: responsive-styles"
+    ></th:block>
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Banner -->
+    <section class="banner">
+      <div class="banner-content">
+        <h1>Bảo vệ sức khỏe trẻ em từ những mũi tiêm đầu tiên</h1>
+        <p>Trung tâm tiêm chủng uy tín với đội ngũ y bác sĩ giàu kinh nghiệm</p>
+        <a href="/schedule/booking" class="btn-cta">Đặt lịch ngay</a>
+      </div>
+    </section>
+
+    <!-- Giới thiệu -->
+    <section class="intro">
+      <div class="container">
+        <h2>Về chúng tôi</h2>
+        <div class="intro-content">
+          <div class="intro-image">
+            <img src="/images/center.jpg" alt="Trung tâm tiêm chủng" />
+          </div>
+          <div class="intro-text">
+            <p>
+              Trung tâm tiêm chủng của chúng tôi là nơi cung cấp dịch vụ tiêm
+              chủng chất lượng cao, đảm bảo an toàn cho trẻ em ở mọi lứa tuổi.
+              Với đội ngũ y bác sĩ giàu kinh nghiệm và cơ sở vật chất hiện đại,
+              chúng tôi cam kết mang đến dịch vụ chăm sóc sức khỏe tốt nhất cho
+              con em của bạn.
+            </p>
+            <ul class="certifications">
+              <li>
+                <i class="fas fa-certificate"></i> Chứng nhận an toàn tiêm chủng
+              </li>
+              <li><i class="fas fa-user-md"></i> Đội ngũ bác sĩ chuyên khoa</li>
+              <li><i class="fas fa-syringe"></i> Vaccine chất lượng cao</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dịch vụ nổi bật -->
+    <section class="featured-services">
+      <div class="container">
+        <h2>Dịch vụ tiêm chủng</h2>
+        <div class="services-grid">
+          <div class="service-card" th:each="service : ${featuredServices}">
+            <div class="service-image">
+              <img th:src="${service.imageUrl}" alt="Dịch vụ tiêm chủng" />
+            </div>
+            <div class="service-info">
+              <h3 th:text="${service.name}">Gói tiêm chủng cơ bản</h3>
+              <p th:text="${service.shortDescription}">
+                Bảo vệ trẻ khỏi các bệnh truyền nhiễm phổ biến với gói vaccine
+                cơ bản.
+              </p>
+              <div class="service-price">
+                <span
+                  th:text="${#numbers.formatDecimal(service.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
+                  >1.200.000 VNĐ</span
+                >
+              </div>
+              <a
+                th:href="@{/services/{id}(id=${service.id})}"
+                class="btn-detail"
+                >Xem chi tiết</a
+              >
+            </div>
+          </div>
+
+          <!-- Fallback nếu không có dữ liệu từ controller -->
+          <div
+            class="service-card"
+            th:if="${featuredServices == null || featuredServices.empty}"
+          >
+            <div class="service-image">
+              <img src="/images/service1.jpg" alt="Gói tiêm chủng cơ bản" />
+            </div>
+            <div class="service-info">
+              <h3>Gói tiêm chủng cơ bản</h3>
+              <p>
+                Bảo vệ trẻ khỏi các bệnh truyền nhiễm phổ biến với gói vaccine
+                cơ bản.
+              </p>
+              <div class="service-price">
+                <span>1.200.000 VNĐ</span>
+              </div>
+              <a href="/services/1" class="btn-detail">Xem chi tiết</a>
+            </div>
+          </div>
+
+          <div
+            class="service-card"
+            th:if="${featuredServices == null || featuredServices.empty}"
+          >
+            <div class="service-image">
+              <img src="/images/service2.jpg" alt="Gói tiêm chủng nâng cao" />
+            </div>
+            <div class="service-info">
+              <h3>Gói tiêm chủng nâng cao</h3>
+              <p>
+                Bảo vệ toàn diện với các loại vaccine phòng ngừa nhiều bệnh hơn.
+              </p>
+              <div class="service-price">
+                <span>2.500.000 VNĐ</span>
+              </div>
+              <a href="/services/2" class="btn-detail">Xem chi tiết</a>
+            </div>
+          </div>
+
+          <div
+            class="service-card"
+            th:if="${featuredServices == null || featuredServices.empty}"
+          >
+            <div class="service-image">
+              <img src="/images/service3.jpg" alt="Tiêm chủng cá thể hóa" />
+            </div>
+            <div class="service-info">
+              <h3>Tiêm chủng cá thể hóa</h3>
+              <p>
+                Lịch tiêm chủng được thiết kế riêng phù hợp với tình trạng sức
+                khỏe của trẻ.
+              </p>
+              <div class="service-price">
+                <span>Liên hệ báo giá</span>
+              </div>
+              <a href="/services/3" class="btn-detail">Xem chi tiết</a>
+            </div>
+          </div>
+        </div>
+        <div class="view-all">
+          <a href="/services" class="btn-view-all">Xem tất cả dịch vụ</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lợi ích tiêm chủng -->
+    <section class="benefits">
+      <div class="container">
+        <h2>Lợi ích của tiêm chủng đúng lịch</h2>
+        <div class="benefits-grid">
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-shield-virus"></i>
+            </div>
+            <h3>Phòng ngừa bệnh</h3>
+            <p>
+              Bảo vệ trẻ khỏi các bệnh truyền nhiễm nguy hiểm như bại liệt, ho
+              gà, sởi...
+            </p>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <h3>Miễn dịch cộng đồng</h3>
+            <p>
+              Góp phần tạo miễn dịch cộng đồng, bảo vệ cả những người không thể
+              tiêm chủng.
+            </p>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-baby"></i>
+            </div>
+            <h3>Phát triển khỏe mạnh</h3>
+            <p>
+              Giúp trẻ phát triển khỏe mạnh, không bị gián đoạn bởi các bệnh có
+              thể phòng ngừa.
+            </p>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-coins"></i>
+            </div>
+            <h3>Tiết kiệm chi phí</h3>
+            <p>
+              Chi phí tiêm phòng thấp hơn nhiều so với chi phí điều trị khi mắc
+              bệnh.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Đánh giá khách hàng -->
+    <section class="testimonials">
+      <div class="container">
+        <h2>Khách hàng nói gì về chúng tôi</h2>
+        <div class="testimonial-slider">
+          <div class="testimonial-item" th:each="testimonial : ${testimonials}">
+            <div class="testimonial-content">
+              <p th:text="${testimonial.content}">
+                "Dịch vụ tiêm chủng tại đây rất tốt, nhân viên thân thiện và
+                chuyên nghiệp. Tôi rất yên tâm khi đưa con đến tiêm chủng tại
+                trung tâm."
+              </p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <img
+                  th:src="${testimonial.avatarUrl}"
+                  alt="Avatar"
+                  src="/images/avatar1.jpg"
+                />
+              </div>
+              <div class="author-info">
+                <h4 th:text="${testimonial.name}">Nguyễn Thị A</h4>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fallback nếu không có dữ liệu từ controller -->
+          <div
+            class="testimonial-item"
+            th:if="${testimonials == null || testimonials.empty}"
+          >
+            <div class="testimonial-content">
+              <p>
+                "Dịch vụ tiêm chủng tại đây rất tốt, nhân viên thân thiện và
+                chuyên nghiệp. Tôi rất yên tâm khi đưa con đến tiêm chủng tại
+                trung tâm."
+              </p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <img src="/images/avatar1.jpg" alt="Avatar" />
+              </div>
+              <div class="author-info">
+                <h4>Nguyễn Thị A</h4>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="testimonial-item"
+            th:if="${testimonials == null || testimonials.empty}"
+          >
+            <div class="testimonial-content">
+              <p>
+                "Đội ngũ y bác sĩ rất tận tâm, giải thích rõ ràng về các loại
+                vaccine và theo dõi sát sao sau khi tiêm. Tôi sẽ tiếp tục đưa
+                con đến đây cho các mũi tiêm tiếp theo."
+              </p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <img src="/images/avatar2.jpg" alt="Avatar" />
+              </div>
+              <div class="author-info">
+                <h4>Trần Văn B</h4>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+  </body>
+</html>

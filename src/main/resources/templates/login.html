@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block
+      th:replace="fragments/responsive-styles :: responsive-styles"
+    ></th:block>
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Login Form -->
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Đăng nhập</h1>
+        <p>Vui lòng đăng nhập để sử dụng đầy đủ tính năng</p>
+      </div>
+
+      <div th:if="${param.error}" class="alert alert-danger">
+        Thông tin đăng nhập không chính xác
+      </div>
+
+      <div th:if="${param.logout}" class="alert alert-success">
+        Bạn đã đăng xuất thành công
+      </div>
+
+      <form
+        th:action="@{/login}"
+        method="post"
+        class="needs-validation"
+        novalidate
+      >
+        <div class="form-group">
+          <label for="username">Email</label>
+          <input
+            type="email"
+            id="username"
+            name="username"
+            class="form-control"
+            required
+          />
+          <div class="form-error">Vui lòng nhập email</div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mật khẩu</label>
+          <div class="password-field">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control"
+              required
+            />
+            <button type="button" class="password-toggle">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="form-error">Vui lòng nhập mật khẩu</div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="remember" name="remember-me" />
+            <label for="remember">Ghi nhớ đăng nhập</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn-primary" style="width: 100%">
+            Đăng nhập
+          </button>
+        </div>
+
+        <div class="form-group text-center">
+          <a href="/forgot-password">Quên mật khẩu?</a>
+        </div>
+      </form>
+
+      <div class="auth-links">
+        <p>Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+  </body>
+</html>

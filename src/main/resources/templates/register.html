@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block
+      th:replace="fragments/responsive-styles :: responsive-styles"
+    ></th:block>
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Register Form -->
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Đăng ký tài khoản</h1>
+        <p>Tạo tài khoản để quản lý lịch tiêm chủng của con bạn</p>
+      </div>
+
+      <div th:if="${param.success}" class="alert alert-success">
+        Đăng ký thành công, vui lòng kiểm tra email để xác nhận tài khoản
+      </div>
+
+      <form
+        th:action="@{/register}"
+        method="post"
+        th:object="${user}"
+        class="needs-validation"
+        novalidate
+      >
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group">
+              <label for="fullName">Họ và tên</label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                th:field="*{fullName}"
+                class="form-control"
+                required
+              />
+              <div
+                class="form-error"
+                th:if="${#fields.hasErrors('fullName')}"
+                th:errors="*{fullName}"
+              >
+                Vui lòng nhập họ tên
+              </div>
+            </div>
+          </div>
+          <div class="form-col">
+            <div class="form-group">
+              <label for="phone">Số điện thoại</label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                th:field="*{phone}"
+                class="form-control"
+                required
+              />
+              <div
+                class="form-error"
+                th:if="${#fields.hasErrors('phone')}"
+                th:errors="*{phone}"
+              >
+                Vui lòng nhập số điện thoại hợp lệ
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            th:field="*{email}"
+            class="form-control"
+            required
+          />
+          <div
+            class="form-error"
+            th:if="${#fields.hasErrors('email')}"
+            th:errors="*{email}"
+          >
+            Vui lòng nhập email hợp lệ
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group">
+              <label for="password">Mật khẩu</label>
+              <div class="password-field">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  th:field="*{password}"
+                  class="form-control"
+                  required
+                />
+                <button type="button" class="password-toggle">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <div
+                class="form-error"
+                th:if="${#fields.hasErrors('password')}"
+                th:errors="*{password}"
+              >
+                Mật khẩu phải có ít nhất 8 ký tự
+              </div>
+            </div>
+          </div>
+          <div class="form-col">
+            <div class="form-group">
+              <label for="confirmPassword">Xác nhận mật khẩu</label>
+              <div class="password-field">
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  class="form-control"
+                  required
+                />
+                <button type="button" class="password-toggle">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <div class="form-error">Mật khẩu xác nhận không khớp</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="terms" name="terms" required />
+            <label for="terms"
+              >Tôi đồng ý với
+              <a href="/terms" target="_blank">Điều khoản sử dụng</a> và
+              <a href="/privacy" target="_blank">Chính sách bảo mật</a></label
+            >
+          </div>
+          <div class="form-error">Vui lòng đồng ý với điều khoản sử dụng</div>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn-primary" style="width: 100%">
+            Đăng ký
+          </button>
+        </div>
+      </form>
+
+      <div class="auth-links">
+        <p>Đã có tài khoản? <a href="/login">Đăng nhập</a></p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const passwordToggles = document.querySelectorAll(".password-toggle");
+
+        passwordToggles.forEach((toggle) => {
+          toggle.addEventListener("click", function () {
+            const passwordField = this.previousElementSibling;
+            const type =
+              passwordField.getAttribute("type") === "password"
+                ? "text"
+                : "password";
+            passwordField.setAttribute("type", type);
+            this.querySelector("i").classList.toggle("fa-eye");
+            this.querySelector("i").classList.toggle("fa-eye-slash");
+          });
+        });
+
+        // Form validation
+        const form = document.querySelector("form");
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirmPassword");
+
+        form.addEventListener("submit", function (event) {
+          if (password.value !== confirmPassword.value) {
+            confirmPassword.nextElementSibling.nextElementSibling.style.display =
+              "block";
+            event.preventDefault();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

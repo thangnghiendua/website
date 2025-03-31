@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bảng giá - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block
+      th:replace="fragments/responsive-styles :: responsive-styles"
+    ></th:block>
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="container">
+        <h1>Bảng giá dịch vụ tiêm chủng</h1>
+      </div>
+    </div>
+
+    <!-- Prices Section -->
+    <section class="prices-section">
+      <div class="container">
+        <!-- Introduction -->
+        <div class="prices-intro">
+          <p>
+            Trung tâm Tiêm chủng cung cấp đa dạng các gói vaccine và dịch vụ
+            tiêm chủng với mức giá cạnh tranh. Chúng tôi cam kết về chất lượng
+            vaccine, đội ngũ y bác sĩ chuyên môn cao và dịch vụ chăm sóc tận
+            tâm.
+          </p>
+          <p>Tất cả giá niêm yết dưới đây đã bao gồm:</p>
+          <ul class="price-includes">
+            <li><i class="fas fa-check-circle"></i> Chi phí vaccine</li>
+            <li>
+              <i class="fas fa-check-circle"></i> Khám sàng lọc trước tiêm
+            </li>
+            <li><i class="fas fa-check-circle"></i> Dịch vụ tiêm chủng</li>
+            <li>
+              <i class="fas fa-check-circle"></i> Theo dõi sau tiêm 30 phút
+            </li>
+            <li>
+              <i class="fas fa-check-circle"></i> Cấp giấy chứng nhận tiêm chủng
+            </li>
+          </ul>
+        </div>
+
+        <!-- Price Filter -->
+        <div class="price-filter">
+          <div class="filter-options">
+            <button class="filter-button active" data-filter="all">
+              Tất cả
+            </button>
+            <button class="filter-button" data-filter="single">Tiêm lẻ</button>
+            <button class="filter-button" data-filter="basic">
+              Gói cơ bản
+            </button>
+            <button class="filter-button" data-filter="premium">
+              Gói nâng cao
+            </button>
+            <button class="filter-button" data-filter="custom">
+              Cá thể hóa
+            </button>
+          </div>
+
+          <div class="search-box">
+            <input type="text" id="priceSearch" placeholder="Tìm vaccine..." />
+            <i class="fas fa-search"></i>
+          </div>
+        </div>
+
+        <!-- Price Tables -->
+        <div class="price-tables">
+          <!-- Single Vaccines -->
+          <div class="price-category" id="single-vaccines">
+            <h2>Vaccine tiêm lẻ</h2>
+
+            <table class="price-table">
+              <thead>
+                <tr>
+                  <th>Tên vaccine</th>
+                  <th>Phòng bệnh</th>
+                  <th>Liều lượng</th>
+                  <th>Giá (VNĐ)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  th:each="vaccine : ${singleVaccines}"
+                  class="price-item"
+                  data-category="single"
+                >
+                  <td th:text="${vaccine.name}">Vaccine Viêm gan B</td>
+                  <td th:text="${vaccine.disease}">Viêm gan B</td>
+                  <td th:text="${vaccine.dosage}">3 mũi</td>
+                  <td
+                    class="price"
+                    th:text="${#numbers.formatDecimal(vaccine.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
+                  >
+                    300.000 VNĐ
+                  </td>
+                  <td>
+                    <a
+                      th:href="@{/schedule/booking?vaccineId={id}(id=${vaccine.id})}"
+                      href="/schedule/booking"
+                      class="btn-book"
+                      >Đặt lịch</a
+                    >
+                  </td>
+                </tr>
+
+                <!-- Fallback nếu không có dữ liệu từ controller -->
+                <tr
+                  class="price-item"
+                  data-category="single"
+                  th:if="${singleVaccines == null || singleVaccines.empty}"
+                >
+                  <td>Vaccine Viêm gan B</td>
+                  <td>Viêm gan B</td>
+                  <td>3 mũi</td>
+                  <td class="price">300.000 VNĐ</td>
+                  <td>
+                    <a href="/schedule/booking" class="btn-book">Đặt lịch</a>
+                  </td>
+                </tr>
+
+                <tr
+                  class="price-item"
+                  data-category="single"
+                  th:if="${singleVaccines == null || singleVaccines.empty}"
+                >
+                  <td>Vaccine DPT</td>
+                  <td>Bạch hầu, Ho gà, Uốn ván</td>
+                  <td>4 mũi</td>
+                  <td class="price">350.000 VNĐ</td>
+                  <td>
+                    <a href="/schedule/booking" class="btn-book">Đặt lịch</a>
+                  </td>
+                </tr>
+
+                <tr
+                  class="price-item"
+                  data-category="single"
+                  th:if="${singleVaccines == null || singleVaccines.empty}"
+                >
+                  <td>Vaccine Sởi - Quai bị - Rubella (MMR)</td>
+                  <td>Sởi, Quai bị, Rubella</td>
+                  <td>2 mũi</td>
+                  <td class="price">400.000 VNĐ</td>
+                  <td>
+                    <a href="/schedule/booking" class="btn-book">Đặt lịch</a>
+                  </td>
+                </tr>
+
+                <tr
+                  class="price-item"
+                  data-category="single"
+                  th:if="${singleVaccines == null || singleVaccines.empty}"
+                >
+                  <td>Vaccine Viêm não Nhật Bản</td>
+                  <td>Viêm não Nhật Bản</td>
+                  <td>3 mũi</td>
+                  <td class="price">650.000 VNĐ</td>
+                  <td>
+                    <a href="/schedule/booking" class="btn-book">Đặt lịch</a>
+                  </td>
+                </tr>
+
+                <tr
+                  class="price-item"
+                  data-category="single"
+                  th:if="${singleVaccines == null || singleVaccines.empty}"
+                >
+                  <td>Vaccine Thủy đậu</td>
+                  <td>Thủy đậu</td>
+                  <td>1 mũi</td>
+                  <td class="price">750.000 VNĐ</td>
+                  <td>
+                    <a href="/schedule/booking" class="btn-book">Đặt lịch</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Basic Packages -->
+          <div class="price-category" id="basic-packages">
+            <h2>Gói tiêm chủng cơ bản</h2>
+
+            <table class="price-table">
+              <thead>
+                <tr>
+                  <th>Tên gói</th>
+                  <th>Bao gồm</th>
+                  <th>Độ tuổi</th>
+                  <th>Giá (VNĐ)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  th:each="package : ${basicPackages}"
+                  class="price-item"
+                  data-category="basic"
+                >
+                  <td th:text="${package.name}">
+                    Gói tiêm chủng cơ bản 0-12 tháng
+                  </td>
+                  <td>
+                    <ul>
+                      <li th:each="item : ${package.items}" th:text="${item}">
+                        Vaccine Viêm gan B
+                      </li>
+                    </ul>
+                  </td>
+                  <td th:text="${package.ageRange}">0-12 tháng</td>
+                  <td
+                    class="price"
+                    th:text="${#numbers.formatDecimal(package.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
+                  >
+                    1.200.000 VNĐ
+                  </td>
+                  <td>
+                    <a
+                      th:href="@{/schedule/booking?packageId={id}(id=${package.id})}"
+                      href="/schedule/booking"
+                      class="btn-book"
+                      >Đặt lịch</a
+                    >
+                  </td>
+                </tr>
+
+                <!-- Fallback nếu không có dữ liệu từ controller -->
+                <tr
+                  class="price-item"
+                  data-category="basic"
+                  th:if="${basicPackages == null || basicPackages.empty}"
+                >
+                  <td>Gói tiêm chủng cơ bản 0-12 tháng</td>
+                  <td>
+                    <ul>
+                      <li>Vaccine Viêm gan B (3 mũi)</li>
+                      <li>Vaccine BCG (1 mũi)</li>
+                      <li>Vaccine DPT (3 mũi)</li>
+                      <li>Vaccine Bại liệt (3 mũi)</li>
+                      <li>Vaccine Hib (3 mũi)</li>
+                    </ul>
+                  </td>
+                  <td>0-12 tháng</td>
+                  <td class="price">1.200.000 VNĐ</td>
+                  <td>
+                    <a href="/schedule/booking" class="btn-book">Đặt lịch</a>
+                  </td>
+                </tr>
+
+                <tr
+                  class="price-item"
+                  data-category="basic"
+                  th:if="${basicPackages == null || basicPackages.empty}"
+                >
+                  <td>Gói tiêm chủng cơ bản 1-2 tuổi</td>
+                  <td>
+                    <ul>
+                      <li>Vaccine DPT (1 mũi nhắc)</li>
+                      <li>Vaccine Bại liệt (1 mũi nhắc)</li>
+                      <li>Vaccine Sởi-Rubella (1 mũi)</li>
+                    </ul>
+                  </td>
+                  <td>1-2 tuổi</td>
+                  <td class="price">800.000 VNĐ</td>
+                  <td>
+                    <a href="/schedule/booking" class="btn-book">Đặt lịch</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Premium Packages -->
+          <div class="price-category" id="premium-packages">
+            <h2>Gói tiêm chủng nâng cao</h2>
+
+            <table class="price-table">
+              <thead>
+                <tr>
+                  <th>Tên gói</th>
+                  <th>Bao gồm</th>
+                  <th>Độ tuổi</th>
+                  <th>Giá (VNĐ)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  th:each="package : ${premiumPackages}"
+                  class="price-item"
+                  data-category="premium"
+                >
+                  <td th:text="${package.name}">
+                    Gói tiêm chủng nâng cao 0-12 tháng
+                  </td>
+                  <td>
+                    <ul>
+                      <li th:each="item : ${package.items}" th:text="${item}">
+                        Tất cả vaccine trong gói cơ bản
+                      </li>
+                    </ul>
+                  </td>
+                  <td th:text="${package.ageRange}">0-12 tháng</td>
+                  <td
+                    class="price"
+                    th:text="${#numbers.formatDecimal(package.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
+                  >
+                    2.500.000 VNĐ
+                  </td>
+                  <td>
+                    <a
+                      th:href="@{/schedule/booking?packageId={id}(id=${package.id})}"
+                      href="/schedule/booking"
+                      class="btn-book"
+                      >Đặt lịch</a
+                    >
+                  </td>
+                </tr>
+
+                <!-- Fallback nếu không có dữ liệu từ controller -->
+                <tr
+                  class="price-item"
+                  data-category="premium"
+                  th:if="${premiumPackages == null || premiumPackages.empty}"
+                >
+                  <td>Gói tiêm chủng nâng cao 0-12 tháng</td>
+                  <td>
+                    <ul>
+                      <li>Tất cả vaccine trong gói cơ bản</li>
+                      <li>Vaccine Viêm não Nhật Bản (3 mũi)</li>
+                      <li>Vaccine Thủy đậu (1 mũi)</li>
+                      <li>Vaccine Viêm phổi (4 mũi)</li>
+                      <li>Vaccine Rotavirus (2-3 mũi)</li>
+                    </ul>
+                  </td>
+                  <td>0-12 tháng</td>
+                  <td class="price">2.500.000 VNĐ</td>
+                  <td>
+                    <a href="/schedule/booking" class="btn-book">Đặt lịch</a>
+                  </td>
+                </tr>
+
+                <tr
+                  class="price-item"
+                  data-category="premium"
+                  th:if="${premiumPackages == null || premiumPackages.empty}"
+                >
+                  <td>Gói tiêm chủng nâng cao 1-5 tuổi</td>
+                  <td>
+                    <ul>
+                      <li>Tất cả vaccine trong gói cơ bản 1-2 tuổi</li>
+                      <li>Vaccine Viêm não Nhật Bản (mũi nhắc)</li>
+                      <li>Vaccine Thủy đậu (1 mũi)</li>
+                      <li>Vaccine Viêm gan A (2 mũi)</li>
+                      <li>Vaccine Cúm mùa (1 mũi/năm)</li>
+                    </ul>
+                  </td>
+                  <td>1-5 tuổi</td>
+                  <td class="price">2.200.000 VNĐ</td>
+                  <td>
+                    <a href="/schedule/booking" class="btn-book">Đặt lịch</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Custom Package -->
+          <div class="price-category" id="custom-package">
+            <h2>Tiêm chủng cá thể hóa</h2>
+
+            <div class="custom-package-info">
+              <div class="custom-package-content">
+                <p>
+                  Gói tiêm chủng cá thể hóa được thiết kế riêng phù hợp với nhu
+                  cầu và tình trạng sức khỏe của từng trẻ. Bác sĩ chuyên khoa sẽ
+                  đánh giá lịch sử tiêm chủng, tình trạng sức khỏe và các yếu tố
+                  khác để xây dựng lịch tiêm chủng tối ưu.
+                </p>
+
+                <div class="custom-features">
+                  <div class="feature">
+                    <div class="feature-icon">
+                      <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h3>Tư vấn chuyên sâu</h3>
+                      <p>
+                        Buổi tư vấn kéo dài 30-45 phút với bác sĩ chuyên khoa
+                        nhi/tiêm chủng
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="feature">
+                    <div class="feature-icon">
+                      <i class="fas fa-file-medical"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h3>Lịch tiêm cá nhân hóa</h3>
+                      <p>
+                        Lịch tiêm được thiết kế riêng dựa trên tình trạng sức
+                        khỏe và nhu cầu của trẻ
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="feature">
+                    <div class="feature-icon">
+                      <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h3>Linh hoạt thời gian</h3>
+                      <p>
+                        Lịch tiêm linh hoạt phù hợp với thời gian của gia đình
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="feature">
+                    <div class="feature-icon">
+                      <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h3>Tư vấn 24/7</h3>
+                      <p>
+                        Hỗ trợ tư vấn qua điện thoại 24/7 về các vấn đề liên
+                        quan đến tiêm chủng
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="custom-package-price">
+                  <div class="price-item" data-category="custom">
+                    <div class="price-header">
+                      <h3>Tư vấn và thiết kế lịch tiêm</h3>
+                      <div class="price">200.000 VNĐ</div>
+                    </div>
+                    <div class="price-note">
+                      <p>
+                        Phí tư vấn sẽ được miễn khi đăng ký tiêm chủng tại trung
+                        tâm
+                      </p>
+                    </div>
+                    <div class="price-action">
+                      <a href="/schedule/booking?type=custom" class="btn-cta"
+                        >Đặt lịch tư vấn</a
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Notes -->
+        <div class="price-notes">
+          <h3>Lưu ý về giá</h3>
+          <ul>
+            <li>
+              Giá có thể thay đổi theo thời điểm và không báo trước. Vui lòng
+              liên hệ trực tiếp để biết giá chính xác nhất.
+            </li>
+            <li>
+              Giá gói tiêm chủng đã bao gồm toàn bộ chi phí vaccine và dịch vụ
+              tiêm chủng.
+            </li>
+            <li>
+              Khách hàng đăng ký gói tiêm chủng sẽ được giảm giá so với tiêm lẻ
+              từng loại vaccine.
+            </li>
+            <li>
+              Trẻ em có thẻ bảo hiểm y tế được hưởng các quyền lợi theo quy định
+              hiện hành của bảo hiểm y tế.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="price-cta">
+          <div class="cta-content">
+            <h3>Bạn cần tư vấn thêm về dịch vụ tiêm chủng?</h3>
+            <p>
+              Liên hệ với chúng tôi để được tư vấn chi tiết về lịch tiêm chủng
+              phù hợp cho con bạn.
+            </p>
+          </div>
+          <div class="cta-buttons">
+            <a href="/contact" class="btn-outline">Liên hệ tư vấn</a>
+            <a href="/schedule/booking" class="btn-primary">Đặt lịch ngay</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Filter buttons
+        const filterButtons = document.querySelectorAll(".filter-button");
+        const priceItems = document.querySelectorAll(".price-item");
+
+        filterButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            // Remove active class from all buttons
+            filterButtons.forEach((btn) => {
+              btn.classList.remove("active");
+            });
+
+            // Add active class to clicked button
+            this.classList.add("active");
+
+            // Get filter value
+            const filterValue = this.getAttribute("data-filter");
+
+            // Show/hide price items based on filter
+            priceItems.forEach((item) => {
+              if (
+                filterValue === "all" ||
+                item.getAttribute("data-category") === filterValue
+              ) {
+                item.style.display = "";
+              } else {
+                item.style.display = "none";
+              }
+            });
+
+            // Show/hide price categories
+            document.querySelectorAll(".price-category").forEach((category) => {
+              if (filterValue === "all") {
+                category.style.display = "";
+              } else if (
+                category.id === filterValue + "-vaccines" ||
+                category.id === filterValue + "-packages" ||
+                category.id === filterValue + "-package"
+              ) {
+                category.style.display = "";
+              } else {
+                // Check if category has any visible items
+                const hasVisibleItems = Array.from(
+                  category.querySelectorAll(".price-item")
+                ).some((item) => item.style.display !== "none");
+
+                category.style.display = hasVisibleItems ? "" : "none";
+              }
+            });
+          });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById("priceSearch");
+
+        searchInput.addEventListener("keyup", function () {
+          const searchValue = this.value.toLowerCase();
+
+          priceItems.forEach((item) => {
+            const itemText = item.textContent.toLowerCase();
+
+            if (itemText.includes(searchValue)) {
+              item.style.display = "";
+            } else {
+              item.style.display = "none";
+            }
+          });
+
+          // Show/hide price categories based on search results
+          document.querySelectorAll(".price-category").forEach((category) => {
+            const hasVisibleItems = Array.from(
+              category.querySelectorAll(".price-item")
+            ).some((item) => item.style.display !== "none");
+
+            category.style.display = hasVisibleItems ? "" : "none";
+          });
+
+          // Clear filter selection if searching
+          if (searchValue.length > 0) {
+            filterButtons.forEach((btn) => {
+              btn.classList.remove("active");
+            });
+
+            document
+              .querySelector('[data-filter="all"]')
+              .classList.add("active");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

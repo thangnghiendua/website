@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lịch tiêm chủng - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="container">
+        <h1>Lịch tiêm chủng</h1>
+      </div>
+    </div>
+
+    <!-- Calendar Section -->
+    <section class="calendar-section">
+      <div class="container">
+        <div class="children-container">
+          <!-- Sidebar -->
+          <div th:replace="fragments/sidebar :: sidebar"></div>
+
+          <!-- Main Content -->
+          <div class="main-content">
+            <!-- Child Selector -->
+            <div
+              class="child-selector"
+              th:if="${children != null && !children.empty}"
+            >
+              <label for="childSelect">Chọn trẻ:</label>
+              <select
+                id="childSelect"
+                class="form-control"
+                onchange="window.location.href = '/schedule/calendar?childId=' + this.value"
+              >
+                <option value="">-- Tất cả --</option>
+                <option
+                  th:each="child : ${children}"
+                  th:value="${child.id}"
+                  th:text="${child.name}"
+                  th:selected="${param.childId != null && param.childId[0] == child.id.toString()}"
+                >
+                  Tên trẻ
+                </option>
+              </select>
+            </div>
+
+            <!-- Desktop Calendar View -->
+            <div class="calendar-container desktop-calendar">
+              <div class="calendar-header">
+                <div class="calendar-month">
+                  <span id="currentMonth">Tháng 6, 2023</span>
+                </div>
+                <div class="calendar-nav">
+                  <button id="prevMonth">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <button id="nextMonth">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="calendar-grid">
+                <!-- Day labels -->
+                <div class="calendar-day-label">CN</div>
+                <div class="calendar-day-label">T2</div>
+                <div class="calendar-day-label">T3</div>
+                <div class="calendar-day-label">T4</div>
+                <div class="calendar-day-label">T5</div>
+                <div class="calendar-day-label">T6</div>
+                <div class="calendar-day-label">T7</div>
+
+                <!-- Calendar days - Will be filled by JavaScript -->
+                <div class="calendar-day other-month">
+                  <div class="day-number">28</div>
+                </div>
+                <div class="calendar-day other-month">
+                  <div class="day-number">29</div>
+                </div>
+                <div class="calendar-day other-month">
+                  <div class="day-number">30</div>
+                </div>
+                <div class="calendar-day other-month">
+                  <div class="day-number">31</div>
+                </div>
+                <div class="calendar-day">
+                  <div class="day-number">1</div>
+                </div>
+                <div class="calendar-day">
+                  <div class="day-number">2</div>
+                </div>
+                <div class="calendar-day">
+                  <div class="day-number">3</div>
+                </div>
+
+                <!-- Example of a day with events -->
+                <div class="calendar-day">
+                  <div class="day-number">4</div>
+                  <div class="day-event">Tiêm Viêm gan B - 09:00</div>
+                </div>
+
+                <!-- Example of today -->
+                <div class="calendar-day today">
+                  <div class="day-number">5</div>
+                  <div class="day-event upcoming">Tiêm DPT - 14:30</div>
+                </div>
+
+                <!-- Example of a day with completed vaccination -->
+                <div class="calendar-day">
+                  <div class="day-number">12</div>
+                  <div class="day-event completed">Tiêm MMR - 10:00</div>
+                </div>
+
+                <!-- Remaining days will be filled by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Mobile Calendar View (Event List) -->
+            <div class="mobile-calendar" style="display: none">
+              <div class="mobile-calendar-header">
+                <h3>Sắp tới</h3>
+              </div>
+
+              <div class="mobile-calendar-events">
+                <div class="mobile-calendar-event">
+                  <div class="mobile-calendar-date">
+                    <div class="mobile-calendar-day">5</div>
+                    <div class="mobile-calendar-info">Tháng 6, 2023</div>
+                  </div>
+                  <div class="mobile-calendar-details">
+                    <div class="mobile-calendar-title">
+                      Tiêm DPT
+                      <span class="mobile-calendar-status upcoming"
+                        >Sắp tới</span
+                      >
+                    </div>
+                    <div class="mobile-calendar-time">14:30</div>
+                    <div class="mobile-calendar-child">Nguyễn Văn An</div>
+                    <div class="mobile-calendar-actions">
+                      <a href="/orders/123" class="btn-outline">Chi tiết</a>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mobile-calendar-event">
+                  <div class="mobile-calendar-date">
+                    <div class="mobile-calendar-day">20</div>
+                    <div class="mobile-calendar-info">Tháng 6, 2023</div>
+                  </div>
+                  <div class="mobile-calendar-details">
+                    <div class="mobile-calendar-title">
+                      Tiêm Viêm não Nhật Bản
+                      <span class="mobile-calendar-status upcoming"
+                        >Sắp tới</span
+                      >
+                    </div>
+                    <div class="mobile-calendar-time">10:00</div>
+                    <div class="mobile-calendar-child">Nguyễn Thị Bình</div>
+                    <div class="mobile-calendar-actions">
+                      <a href="/orders/124" class="btn-outline">Chi tiết</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mobile-calendar-header">
+                <h3>Đã hoàn thành</h3>
+              </div>
+
+              <div class="mobile-calendar-events">
+                <div class="mobile-calendar-event">
+                  <div class="mobile-calendar-date">
+                    <div class="mobile-calendar-day">12</div>
+                    <div class="mobile-calendar-info">Tháng 6, 2023</div>
+                  </div>
+                  <div class="mobile-calendar-details">
+                    <div class="mobile-calendar-title">
+                      Tiêm MMR
+                      <span class="mobile-calendar-status completed"
+                        >Đã tiêm</span
+                      >
+                    </div>
+                    <div class="mobile-calendar-time">10:00</div>
+                    <div class="mobile-calendar-child">Nguyễn Văn An</div>
+                    <div class="mobile-calendar-actions">
+                      <a href="/orders/120" class="btn-outline">Chi tiết</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recommended Vaccinations -->
+            <div
+              class="recommended-vaccinations"
+              th:if="${param.childId != null}"
+            >
+              <h3>Vaccine khuyến nghị cho độ tuổi này</h3>
+
+              <div class="vaccination-timeline">
+                <div class="timeline-item">
+                  <div class="timeline-point"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <h4>Vaccine Viêm gan B (liều 3)</h4>
+                      <span class="timeline-age"
+                        >Khuyến nghị: 6 tháng tuổi</span
+                      >
+                    </div>
+                    <div class="timeline-body">
+                      <p>
+                        Mũi tiêm cuối cùng trong loạt vaccine ngừa Viêm gan B.
+                      </p>
+                    </div>
+                    <div class="timeline-actions">
+                      <a
+                        href="/schedule/booking?childId=1&vaccineId=3"
+                        class="btn-outline"
+                        >Đặt lịch</a
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="timeline-item">
+                  <div class="timeline-point"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <h4>Vaccine Bại liệt (IPV liều 3)</h4>
+                      <span class="timeline-age"
+                        >Khuyến nghị: 6 tháng tuổi</span
+                      >
+                    </div>
+                    <div class="timeline-body">
+                      <p>Mũi tiêm thứ ba trong loạt vaccine ngừa Bại liệt.</p>
+                    </div>
+                    <div class="timeline-actions">
+                      <a
+                        href="/schedule/booking?childId=1&vaccineId=6"
+                        class="btn-outline"
+                        >Đặt lịch</a
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="timeline-item">
+                  <div class="timeline-point"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <h4>Vaccine Cúm mùa</h4>
+                      <span class="timeline-age">Khuyến nghị: Hàng năm</span>
+                    </div>
+                    <div class="timeline-body">
+                      <p>Vaccine ngừa cúm mùa, khuyến nghị tiêm hàng năm.</p>
+                    </div>
+                    <div class="timeline-actions">
+                      <a
+                        href="/schedule/booking?childId=1&vaccineId=10"
+                        class="btn-outline"
+                        >Đặt lịch</a
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+    <script>
+      // Simple calendar script
+      document.addEventListener("DOMContentLoaded", function () {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+
+        // Update month display
+        function updateCalendarMonth(month, year) {
+          const monthNames = [
+            "Tháng 1",
+            "Tháng 2",
+            "Tháng 3",
+            "Tháng 4",
+            "Tháng 5",
+            "Tháng 6",
+            "Tháng 7",
+            "Tháng 8",
+            "Tháng 9",
+            "Tháng 10",
+            "Tháng 11",
+            "Tháng 12",
+          ];
+          document.getElementById(
+            "currentMonth"
+          ).textContent = `${monthNames[month]}, ${year}`;
+        }
+
+        // Initial display
+        updateCalendarMonth(currentMonth, currentYear);
+
+        // Navigation buttons
+        document
+          .getElementById("prevMonth")
+          .addEventListener("click", function () {
+            // In a real application, this would fetch the previous month's data
+            alert("Xem tháng trước");
+          });
+
+        document
+          .getElementById("nextMonth")
+          .addEventListener("click", function () {
+            // In a real application, this would fetch the next month's data
+            alert("Xem tháng sau");
+          });
+      });
+    </script>
+  </body>
+</html>

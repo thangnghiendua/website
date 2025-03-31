@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cẩm nang tiêm chủng - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block
+      th:replace="fragments/responsive-styles :: responsive-styles"
+    ></th:block>
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="container">
+        <h1>Cẩm nang tiêm chủng</h1>
+      </div>
+    </div>
+
+    <!-- Guide Content -->
+    <section class="guide-section">
+      <div class="container">
+        <!-- Guide Navigation -->
+        <div class="guide-navigation">
+          <ul>
+            <li>
+              <a href="#importance" class="active"
+                >Tầm quan trọng của tiêm chủng</a
+              >
+            </li>
+            <li><a href="#schedule">Lịch tiêm chủng khuyến nghị</a></li>
+            <li><a href="#preparation">Chuẩn bị trước khi tiêm</a></li>
+            <li><a href="#after-care">Chăm sóc sau tiêm</a></li>
+            <li><a href="#side-effects">Phản ứng sau tiêm</a></li>
+            <li><a href="#faq">Câu hỏi thường gặp</a></li>
+          </ul>
+        </div>
+
+        <!-- Guide Content -->
+        <div class="guide-content">
+          <!-- Tầm quan trọng -->
+          <div id="importance" class="guide-section">
+            <h2>Tầm quan trọng của tiêm chủng</h2>
+
+            <div class="guide-image">
+              <img
+                src="/images/importance-vaccination.jpg"
+                alt="Tầm quan trọng của tiêm chủng"
+              />
+            </div>
+
+            <p>
+              Tiêm chủng là một trong những thành tựu y học quan trọng nhất, đã
+              cứu sống hàng triệu sinh mạng mỗi năm. Tiêm chủng không chỉ bảo vệ
+              cá nhân người được tiêm mà còn góp phần tạo ra "miễn dịch cộng
+              đồng", giúp bảo vệ cả những người không thể tiêm chủng vì lý do
+              sức khỏe.
+            </p>
+
+            <h3>Lợi ích của tiêm chủng cho trẻ em</h3>
+            <ul>
+              <li>
+                <strong>Phòng ngừa bệnh hiệu quả:</strong> Vaccine giúp phòng
+                ngừa nhiều bệnh truyền nhiễm nguy hiểm như bại liệt, ho gà, uốn
+                ván, sởi, viêm gan B...
+              </li>
+              <li>
+                <strong>Giảm biến chứng:</strong> Ngay cả khi tiêm chủng không
+                ngăn ngừa hoàn toàn một bệnh, nó vẫn có thể giảm đáng kể mức độ
+                nghiêm trọng và biến chứng của bệnh.
+              </li>
+              <li>
+                <strong>Tạo miễn dịch cộng đồng:</strong> Khi đủ số lượng người
+                được tiêm chủng, bệnh khó lây lan, bảo vệ cả những người chưa
+                được tiêm.
+              </li>
+              <li>
+                <strong>Tiết kiệm chi phí:</strong> Chi phí tiêm phòng thấp hơn
+                nhiều so với chi phí điều trị khi mắc bệnh.
+              </li>
+            </ul>
+
+            <blockquote>
+              <p>
+                "Vaccine an toàn và hiệu quả. Chúng được phát triển qua các thử
+                nghiệm nghiêm ngặt và tiếp tục được giám sát sau khi đưa vào sử
+                dụng."
+              </p>
+              <cite>— Tổ chức Y tế Thế giới (WHO)</cite>
+            </blockquote>
+          </div>
+
+          <!-- Lịch tiêm chủng -->
+          <div id="schedule" class="guide-section">
+            <h2>Lịch tiêm chủng khuyến nghị</h2>
+
+            <p>
+              Tiêm chủng đúng lịch là yếu tố quan trọng đảm bảo hiệu quả bảo vệ.
+              Dưới đây là lịch tiêm chủng cơ bản cho trẻ em theo khuyến nghị của
+              Bộ Y tế.
+            </p>
+
+            <div class="vaccination-schedule">
+              <h3>Lịch tiêm chủng cho trẻ dưới 1 tuổi</h3>
+              <table class="schedule-table">
+                <thead>
+                  <tr>
+                    <th>Tuổi</th>
+                    <th>Vaccine</th>
+                    <th>Phòng bệnh</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Sơ sinh</td>
+                    <td>BCG<br />Viêm gan B (liều 1)</td>
+                    <td>Lao<br />Viêm gan B</td>
+                  </tr>
+                  <tr>
+                    <td>2 tháng</td>
+                    <td>DPT-VGB-Hib (liều 1)<br />OPV (liều 1)</td>
+                    <td>
+                      Bạch hầu, Ho gà, Uốn ván, Viêm gan B, Hib<br />Bại liệt
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>3 tháng</td>
+                    <td>DPT-VGB-Hib (liều 2)<br />OPV (liều 2)</td>
+                    <td>
+                      Bạch hầu, Ho gà, Uốn ván, Viêm gan B, Hib<br />Bại liệt
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>4 tháng</td>
+                    <td>DPT-VGB-Hib (liều 3)<br />OPV (liều 3)</td>
+                    <td>
+                      Bạch hầu, Ho gà, Uốn ván, Viêm gan B, Hib<br />Bại liệt
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>9 tháng</td>
+                    <td>Sởi</td>
+                    <td>Sởi</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h3>Lịch tiêm chủng cho trẻ 1-6 tuổi</h3>
+              <table class="schedule-table">
+                <thead>
+                  <tr>
+                    <th>Tuổi</th>
+                    <th>Vaccine</th>
+                    <th>Phòng bệnh</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>18 tháng</td>
+                    <td>DPT (liều 4)<br />OPV (liều 4)<br />Sởi-Rubella</td>
+                    <td>
+                      Bạch hầu, Ho gà, Uốn ván<br />Bại liệt<br />Sởi, Rubella
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>4 tuổi</td>
+                    <td>DT</td>
+                    <td>Bạch hầu, Uốn ván</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="note-box">
+              <h4><i class="fas fa-info-circle"></i> Lưu ý quan trọng</h4>
+              <p>
+                Lịch tiêm chủng có thể thay đổi tùy theo tình hình dịch bệnh và
+                khuyến nghị y tế mới nhất. Vui lòng tham khảo ý kiến bác sĩ để
+                có lịch tiêm phù hợp nhất cho trẻ.
+              </p>
+            </div>
+          </div>
+
+          <!-- Chuẩn bị trước khi tiêm -->
+          <div id="preparation" class="guide-section">
+            <h2>Chuẩn bị trước khi tiêm</h2>
+
+            <div class="guide-image">
+              <img
+                src="/images/preparation.jpg"
+                alt="Chuẩn bị trước khi tiêm"
+              />
+            </div>
+
+            <p>
+              Chuẩn bị kỹ lưỡng trước khi đưa trẻ đi tiêm chủng giúp quá trình
+              diễn ra suôn sẻ và hiệu quả. Dưới đây là những điều phụ huynh nên
+              lưu ý:
+            </p>
+
+            <div class="preparation-steps">
+              <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <h3>Tìm hiểu thông tin</h3>
+                  <p>
+                    Tìm hiểu về loại vaccine trẻ sắp tiêm, công dụng và những
+                    phản ứng có thể xảy ra sau tiêm.
+                  </p>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <h3>Kiểm tra sức khỏe của trẻ</h3>
+                  <p>
+                    Trẻ nên được khỏe mạnh khi đi tiêm. Nếu trẻ đang sốt hoặc bị
+                    ốm, hãy thông báo cho bác sĩ trước khi tiêm.
+                  </p>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <h3>Chuẩn bị giấy tờ</h3>
+                  <p>
+                    Mang theo sổ tiêm chủng, thẻ bảo hiểm y tế và các giấy tờ
+                    tùy thân cần thiết.
+                  </p>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                  <h3>Cho trẻ ăn uống đầy đủ</h3>
+                  <p>
+                    Trẻ nên được ăn uống bình thường trước khi tiêm. Tránh để
+                    trẻ đói khi đi tiêm.
+                  </p>
+                </div>
+              </div>
+
+              <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                  <h3>Mặc trang phục thuận tiện</h3>
+                  <p>
+                    Mặc quần áo dễ cởi để bác sĩ dễ dàng thực hiện tiêm chủng,
+                    đặc biệt là vùng cần tiêm.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chăm sóc sau tiêm -->
+          <div id="after-care" class="guide-section">
+            <h2>Chăm sóc sau tiêm</h2>
+
+            <p>
+              Sau khi tiêm chủng, việc theo dõi và chăm sóc trẻ đúng cách rất
+              quan trọng để đảm bảo an toàn và giảm thiểu các phản ứng phụ.
+            </p>
+
+            <div class="care-instructions">
+              <div class="care-item">
+                <div class="care-icon">
+                  <i class="fas fa-thermometer"></i>
+                </div>
+                <div class="care-content">
+                  <h3>Theo dõi nhiệt độ</h3>
+                  <p>
+                    Theo dõi thân nhiệt của trẻ trong 48 giờ sau tiêm. Nếu trẻ
+                    sốt trên 38.5°C, hãy dùng thuốc hạ sốt theo hướng dẫn của
+                    bác sĩ.
+                  </p>
+                </div>
+              </div>
+
+              <div class="care-item">
+                <div class="care-icon">
+                  <i class="fas fa-hand-holding-medical"></i>
+                </div>
+                <div class="care-content">
+                  <h3>Chăm sóc vị trí tiêm</h3>
+                  <p>
+                    Giữ vị trí tiêm sạch sẽ và khô ráo. Có thể chườm lạnh nếu vị
+                    trí tiêm sưng đỏ. Tránh xoa bóp mạnh vùng tiêm.
+                  </p>
+                </div>
+              </div>
+
+              <div class="care-item">
+                <div class="care-icon">
+                  <i class="fas fa-glass-water"></i>
+                </div>
+                <div class="care-content">
+                  <h3>Cho trẻ uống nhiều nước</h3>
+                  <p>
+                    Cho trẻ uống nhiều nước để tránh mất nước, đặc biệt nếu trẻ
+                    bị sốt.
+                  </p>
+                </div>
+              </div>
+
+              <div class="care-item">
+                <div class="care-icon">
+                  <i class="fas fa-bed"></i>
+                </div>
+                <div class="care-content">
+                  <h3>Nghỉ ngơi đầy đủ</h3>
+                  <p>
+                    Cho trẻ nghỉ ngơi nhiều hơn trong 1-2 ngày sau tiêm, đặc
+                    biệt nếu trẻ cảm thấy mệt mỏi.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="warning-box">
+              <h4>
+                <i class="fas fa-exclamation-triangle"></i> Khi nào cần liên hệ
+                bác sĩ
+              </h4>
+              <ul>
+                <li>Sốt cao trên 39.5°C hoặc sốt kéo dài trên 48 giờ</li>
+                <li>Co giật hoặc có dấu hiệu thần kinh bất thường</li>
+                <li>
+                  Nổi mẩn đỏ trên da, khó thở hoặc sưng mặt (dấu hiệu của phản
+                  ứng dị ứng)
+                </li>
+                <li>Trẻ quấy khóc liên tục trên 3 giờ</li>
+                <li>Vị trí tiêm sưng đỏ nhiều, lan rộng hoặc có mủ</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Phản ứng sau tiêm -->
+          <div id="side-effects" class="guide-section">
+            <h2>Phản ứng sau tiêm</h2>
+
+            <p>
+              Vaccine nhìn chung rất an toàn, nhưng như mọi biện pháp y tế khác,
+              có thể gây ra một số phản ứng nhẹ. Hầu hết các phản ứng này là tạm
+              thời và sẽ tự khỏi sau vài ngày.
+            </p>
+
+            <h3>Phản ứng phổ biến</h3>
+            <ul class="side-effects-list">
+              <li>
+                <strong>Đau, sưng, đỏ tại vị trí tiêm:</strong> Đây là phản ứng
+                cục bộ thường gặp nhất, thường biến mất sau 1-2 ngày.
+              </li>
+              <li>
+                <strong>Sốt nhẹ:</strong> Trẻ có thể bị sốt nhẹ (dưới 38.5°C)
+                trong 24-48 giờ sau tiêm.
+              </li>
+              <li>
+                <strong>Quấy khóc, mệt mỏi:</strong> Trẻ có thể cảm thấy khó
+                chịu và quấy khóc nhiều hơn bình thường.
+              </li>
+              <li>
+                <strong>Chán ăn:</strong> Trẻ có thể ăn ít hơn trong 1-2 ngày
+                sau tiêm.
+              </li>
+            </ul>
+
+            <h3>Phản ứng ít gặp</h3>
+            <ul class="side-effects-list">
+              <li>
+                <strong>Sốt cao:</strong> Sốt trên 38.5°C, thường xảy ra sau một
+                số loại vaccine như DPT.
+              </li>
+              <li>
+                <strong>Nổi mẩn đỏ:</strong> Có thể xuất hiện sau tiêm vaccine
+                sởi, rubella.
+              </li>
+              <li>
+                <strong>Sưng hạch bạch huyết:</strong> Hạch bạch huyết gần vị
+                trí tiêm có thể sưng lên.
+              </li>
+            </ul>
+
+            <div class="note-box">
+              <h4><i class="fas fa-info-circle"></i> Điều cần biết</h4>
+              <p>
+                Các phản ứng sau tiêm thường là dấu hiệu cho thấy cơ thể đang
+                tạo ra phản ứng miễn dịch - điều mà vaccine nhắm đến. Tuy nhiên,
+                không phải tất cả trẻ đều gặp phản ứng, và việc không có phản
+                ứng không có nghĩa là vaccine không hiệu quả.
+              </p>
+            </div>
+          </div>
+
+          <!-- Câu hỏi thường gặp -->
+          <div id="faq" class="guide-section">
+            <h2>Câu hỏi thường gặp</h2>
+
+            <div class="faq-list">
+              <div class="faq-item">
+                <div class="faq-question">
+                  <i class="fas fa-question-circle"></i>
+                  <h3>Tiêm nhiều vaccine cùng lúc có an toàn không?</h3>
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                  <p>
+                    Nghiên cứu khoa học đã chứng minh rằng việc tiêm nhiều
+                    vaccine cùng lúc là an toàn và hiệu quả. Hệ thống miễn dịch
+                    của trẻ có khả năng đáp ứng với nhiều kháng nguyên cùng lúc.
+                    Tiêm nhiều vaccine trong một lần thăm khám cũng giúp giảm số
+                    lần đưa trẻ đến cơ sở y tế.
+                  </p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <div class="faq-question">
+                  <i class="fas fa-question-circle"></i>
+                  <h3>Nếu trẻ bị ốm nhẹ, có nên hoãn tiêm chủng không?</h3>
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                  <p>
+                    Trẻ bị ốm nhẹ như cảm lạnh nhẹ, sổ mũi hoặc tiêu chảy nhẹ
+                    vẫn có thể tiêm chủng. Tuy nhiên, nếu trẻ sốt cao hoặc bị ốm
+                    vừa đến nặng, nên tham khảo ý kiến bác sĩ và có thể cần hoãn
+                    tiêm chủng đến khi trẻ khỏe hơn.
+                  </p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <div class="faq-question">
+                  <i class="fas fa-question-circle"></i>
+                  <h3>Nếu trẻ bỏ lỡ một mũi tiêm trong lịch, phải làm gì?</h3>
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                  <p>
+                    Nếu trẻ bỏ lỡ một mũi tiêm, không cần bắt đầu lại toàn bộ
+                    lịch tiêm. Hãy liên hệ với bác sĩ để được hướng dẫn tiêm bổ
+                    sung mũi đã bỏ lỡ càng sớm càng tốt. Trong hầu hết trường
+                    hợp, lịch tiêm có thể được điều chỉnh để đảm bảo trẻ được
+                    bảo vệ đầy đủ.
+                  </p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <div class="faq-question">
+                  <i class="fas fa-question-circle"></i>
+                  <h3>Vaccine có chứa thủy ngân không?</h3>
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                  <p>
+                    Hầu hết vaccine hiện nay không chứa thimerosal (một hợp chất
+                    chứa thủy ngân). Kể từ năm 2001, thimerosal đã được loại bỏ
+                    hoặc giảm đến mức không đáng kể trong hầu hết các vaccine
+                    dành cho trẻ em, ngoại trừ một số loại vaccine cúm đa liều.
+                    Nghiên cứu khoa học đã khẳng định không có mối liên hệ giữa
+                    thimerosal trong vaccine và các vấn đề phát triển như tự kỷ.
+                  </p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <div class="faq-question">
+                  <i class="fas fa-question-circle"></i>
+                  <h3>Tiêm chủng có thể gây tự kỷ không?</h3>
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                  <p>
+                    Không, nhiều nghiên cứu khoa học quy mô lớn đã khẳng định
+                    không có mối liên hệ giữa vaccine và tự kỷ. Giả thuyết về
+                    mối liên hệ này xuất phát từ một nghiên cứu có sai sót
+                    phương pháp năm 1998, đã bị rút lại và bác bỏ bởi cộng đồng
+                    khoa học.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Smooth scroll for anchor links
+        document.querySelectorAll(".guide-navigation a").forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            // Remove active class from all links
+            document.querySelectorAll(".guide-navigation a").forEach((link) => {
+              link.classList.remove("active");
+            });
+
+            // Add active class to clicked link
+            this.classList.add("active");
+
+            // Scroll to section
+            const targetId = this.getAttribute("href");
+            const targetSection = document.querySelector(targetId);
+
+            if (targetSection) {
+              window.scrollTo({
+                top: targetSection.offsetTop - 100,
+                behavior: "smooth",
+              });
+            }
+          });
+        });
+
+        // FAQ toggle
+        document.querySelectorAll(".faq-question").forEach((question) => {
+          question.addEventListener("click", function () {
+            const answer = this.nextElementSibling;
+            const icon = this.querySelector(".fa-chevron-down");
+
+            if (answer.style.maxHeight) {
+              answer.style.maxHeight = null;
+              icon.style.transform = "rotate(0deg)";
+            } else {
+              answer.style.maxHeight = answer.scrollHeight + "px";
+              icon.style.transform = "rotate(180deg)";
+            }
+          });
+        });
+
+        // Highlight active section on scroll
+        window.addEventListener("scroll", function () {
+          const sections = document.querySelectorAll(".guide-section");
+          let currentSection = "";
+
+          sections.forEach((section) => {
+            const sectionTop = section.offsetTop - 150;
+            const sectionHeight = section.clientHeight;
+
+            if (
+              pageYOffset >= sectionTop &&
+              pageYOffset < sectionTop + sectionHeight
+            ) {
+              currentSection = "#" + section.getAttribute("id");
+            }
+          });
+
+          document.querySelectorAll(".guide-navigation a").forEach((link) => {
+            link.classList.remove("active");
+            if (link.getAttribute("href") === currentSection) {
+              link.classList.add("active");
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
