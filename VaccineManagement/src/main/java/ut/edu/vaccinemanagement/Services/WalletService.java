@@ -1,76 +1,123 @@
 package ut.edu.vaccinemanagement.Services;
-import ut.edu.vaccinemanagement.Repositories.WalletRepository;
-import ut.edu.vaccinemanagement.Repositories.PaymentRepository;
-import ut.edu.vaccinemanagement.models.Payment;
-import ut.edu.vaccinemanagement.models.Wallet;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ut.edu.vaccinemanagement.models.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ut.edu.vaccinemanagement.Repositories.PaymentRepository;
+import ut.edu.vaccinemanagement.Repositories.WalletRepository;
+import ut.edu.vaccinemanagement.models.Payment;
+import ut.edu.vaccinemanagement.models.PaymentStatus;
+import ut.edu.vaccinemanagement.models.User;
+import ut.edu.vaccinemanagement.models.Wallet;
+
 @Service
 public class WalletService {
-    @Autowired
-    WalletRepository walletRepository;
+    private static final Logger logger = LoggerFactory.getLogger(WalletService.class);
 
     @Autowired
-    PaymentRepository paymentRepository;
+    private WalletRepository walletRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Transactional
     public boolean transferAmount(Long userId, BigDecimal amount) {
-        Optional<Wallet> senderWalletOpt = walletRepository.findByUserId(userId);
-        Optional<Wallet> receiverWalletOpt = walletRepository.findByUserId(1L); // Admin/User ID = 1
+        logger.info("Bắt đầu chuyển khoản: User ID={}, Số tiền={}", userId, amount);
 
-        if (senderWalletOpt.isPresent() && receiverWalletOpt.isPresent()) {
-            Wallet senderWallet = senderWalletOpt.get();
-            Wallet receiverWallet = receiverWalletOpt.get();
-
-            if (senderWallet.getAccountBalance().compareTo(amount) >= 0) {
-                senderWallet.setAccountBalance(senderWallet.getAccountBalance().subtract(amount));
-                receiverWallet.setAccountBalance(receiverWallet.getAccountBalance().add(amount));
-
-                walletRepository.save(senderWallet);
-                walletRepository.save(receiverWallet);
-
-                String transferDescription = "Chuyển khoản ";
-
-                Payment payment = new Payment(senderWallet.getUser(), amount, new Date(), PaymentStatus.SUCCESS, transferDescription);
-                paymentRepository.save(payment);
-
-
-                return true;
-            } else {
-                // Giao dịch thất bại do số dư không đủ
-                String transferDescription = "Chuyển khoản thất bại: Số dư không đủ";
-                Payment failedPayment = new Payment(senderWallet.getUser(), amount, new Date(), PaymentStatus.FAILED, transferDescription);
-                paymentRepository.save(failedPayment);
-            }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            logger.warn("Số tiền chuyển khoản không hợp lệ: {}", amount);
+            return false;
         }
 
-        return false;
+        Optional<Wallet> senderWalletOpt = walletRepository.findByUserId(userId);
+        Optional<Wallet> receiverWalletOpt = walletRepository.findByUserId(1L);
+
+        if (!isWalletsPresent(senderWalletOpt, receiverWalletOpt)) {
+            logger.warn("Không tìm thấy ví của người gửi hoặc người nhận");
+            return false;
+        }
+
+        Wallet senderWallet = senderWalletOpt.get();
+        Wallet receiverWallet = receiverWalletOpt.get();
+        User sender = senderWallet.getUser();
+
+        try {
+            if (hasSufficientBalance(senderWallet, amount)) {
+                processTransfer(senderWallet, receiverWallet, amount);
+
+                createPayment(sender, amount, PaymentStatus.SUCCESS, "Chuyển khoản thành công");
+
+                logger.info("Chuyển khoản thành công: User ID={}, Số tiền={}", userId, amount);
+                return true;
+            } else {
+                createPayment(sender, amount, PaymentStatus.FAILED, "Chuyển khoản thất bại: Số dư không đủ");
+
+                logger.warn("Chuyển khoản thất bại - Số dư không đủ: User ID={}", userId);
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("Lỗi trong quá trình chuyển khoản: {}", e.getMessage(), e);
+            return false;
+        }
     }
 
+    @Transactional
     public boolean rechargeWallet(Long userId, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            return false; // Không thể nạp số tiền âm hoặc bằng 0
+        logger.info("Bắt đầu nạp tiền: User ID={}, Số tiền={}", userId, amount);
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            logger.warn("Số tiền nạp không hợp lệ: {}", amount);
+            return false;
         }
 
         Optional<Wallet> walletOpt = walletRepository.findByUserId(userId);
-        if (walletOpt.isPresent()) {
+        if (!walletOpt.isPresent()) {
+            logger.warn("Không tìm thấy ví của người dùng: User ID={}", userId);
+            return false;
+        }
+
+        try {
             Wallet wallet = walletOpt.get();
+            User user = wallet.getUser();
+
             wallet.setAccountBalance(wallet.getAccountBalance().add(amount));
             walletRepository.save(wallet);
 
-            // Thêm mô tả giao dịch
-            String transferDescription = "Nạp tiền vào ví";
+            createPayment(user, amount, PaymentStatus.SUCCESS, "Nạp tiền vào ví");
 
-            // Lưu lịch sử nạp tiền thành công
-            Payment payment = new Payment(wallet.getUser(), amount, new Date(), PaymentStatus.SUCCESS, transferDescription);
-            paymentRepository.save(payment);
-
+            logger.info("Nạp tiền thành công: User ID={}, Số tiền={}", userId, amount);
             return true;
+        } catch (Exception e) {
+            logger.error("Lỗi trong quá trình nạp tiền: {}", e.getMessage(), e);
+            return false;
         }
-        return false;
-        }
+    }
+
+    private boolean isWalletsPresent(Optional<Wallet> senderWalletOpt, Optional<Wallet> receiverWalletOpt) {
+        return senderWalletOpt.isPresent() && receiverWalletOpt.isPresent();
+    }
+
+    private boolean hasSufficientBalance(Wallet senderWallet, BigDecimal amount) {
+        return senderWallet.getAccountBalance().compareTo(amount) >= 0;
+    }
+
+    private void processTransfer(Wallet senderWallet, Wallet receiverWallet, BigDecimal amount) {
+        senderWallet.setAccountBalance(senderWallet.getAccountBalance().subtract(amount));
+        receiverWallet.setAccountBalance(receiverWallet.getAccountBalance().add(amount));
+
+        walletRepository.save(senderWallet);
+        walletRepository.save(receiverWallet);
+    }
+
+    private Payment createPayment(User user, BigDecimal amount, PaymentStatus status, String description) {
+        Payment payment = new Payment(user, amount, new Date(), status, description);
+        return paymentRepository.save(payment);
+    }
 }

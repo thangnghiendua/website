@@ -77,4 +77,13 @@ public class ReactionReport {
     public void setReportDate(Date reportDate) {
         this.reportDate = reportDate;
     }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
 }

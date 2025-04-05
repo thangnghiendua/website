@@ -1,5 +1,5 @@
 package ut.edu.vaccinemanagement.models;
 
 public enum AppointmentStatus {
-    Complete,Pending,Canceled
+    Complete,Pending,Canceled,Confirmed
 }
