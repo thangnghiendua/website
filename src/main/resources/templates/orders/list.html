@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn đặt lịch - Trung tâm Tiêm chủng</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block th:replace="fragments/responsive-styles :: responsive-styles"></th:block>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1>Đơn đặt lịch</h1>
+        </div>
+    </div>
+    
+    <!-- Orders List Section -->
+    <section class="orders-section">
+        <div class="container">
+            <div class="children-container">
+                <!-- Sidebar -->
+                <div th:replace="fragments/sidebar :: sidebar"></div>
+                
+                <!-- Main Content -->
+                <div class="main-content">
+                    <div th:if="${param.success}" class="alert alert-success">
+                        Thao tác thành công!
+                    </div>
+                    
+                    <!-- Filter -->
+                    <div class="orders-filter">
+                        <div class="filter-group">
+                            <label for="statusFilter">Trạng thái:</label>
+                            <select id="statusFilter" class="form-control">
+                                <option value="">Tất cả</option>
+                                <option value="pending">Chờ xác nhận</option>
+                                <option value="confirmed">Đã xác nhận</option>
+                                <option value="completed">Đã hoàn thành</option>
+                                <option value="cancelled">Đã hủy</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="dateFilter">Ngày tiêm:</label>
+                            <input type="date" id="dateFilter" class="form-control">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="childFilter">Trẻ em:</label>
+                            <select id="childFilter" class="form-control">
+                                <option value="">Tất cả</option>
+                                <option th:each="child : ${children}" th:value="${child.id}" th:text="${child.name}">Nguyễn Văn An</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn-filter">
+                            <i class="fas fa-filter"></i> Lọc
+                        </button>
+                    </div>
+                    
+                    <!-- Orders List -->
+                    <div class="orders-list">
+                        <div class="order-item" th:each="order : ${orders}">
+                            <div class="order-header">
+                                <div class="order-id">
+                                    <span>Mã đơn:</span>
+                                    <strong th:text="${order.id}">BK-1001</strong>
+                                </div>
+                                <div class="order-status">
+                                    <span th:class="'status status-' + ${order.status}" th:text="${order.statusText}" class="status status-pending">Chờ xác nhận</span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-details">
+                                <div class="order-child">
+                                    <h4>Trẻ:</h4>
+                                    <p th:text="${order.child?.name}">Nguyễn Văn An</p>
+                                </div>
+                                
+                                <div class="order-service">
+                                    <h4>Dịch vụ:</h4>
+                                    <p th:text="${order.service?.name}">Tiêm vaccine Viêm gan B</p>
+                                </div>
+                                
+                                <div class="order-datetime">
+                                    <h4>Ngày giờ:</h4>
+                                    <p th:text="${#dates.format(order.datetime, 'dd/MM/yyyy HH:mm')}">30/06/2023 09:00</p>
+                                </div>
+                            </div>
+                            
+                            <div class="order-actions">
+                                <a th:href="@{/orders/{id}(id=${order.id})}" class="btn-outline">Xem chi tiết</a>
+                                
+                                <a th:if="${order.status == 'confirmed' && !order.isPaid}" th:href="@{/orders/{id}/payment(id=${order.id})}" class="btn-primary">Thanh toán</a>
+                                
+                                <button th:if="${order.status == 'pending' || order.status == 'confirmed'}" class="btn-danger" data-toggle="modal" th:data-target="'#cancelOrderModal-' + ${order.id}">Hủy đơn</button>
+                            </div>
+                            
+                            <!-- Cancel Order Modal -->
+                            <div class="modal" th:id="'cancelOrderModal-' + ${order.id}">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h3>Hủy đơn đặt lịch</h3>
+                                        <span class="modal-close" data-dismiss="modal">&times;</span>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post">
+                                            <div class="form-group">
+                                                <label for="cancelReason">Lý do hủy:</label>
+                                                <select id="cancelReason" name="cancelReason" class="form-control" required>
+                                                    <option value="">-- Chọn lý do --</option>
+                                                    <option value="schedule_conflict">Lịch bận không thể đến</option>
+                                                    <option value="child_sick">Trẻ bị ốm</option>
+                                                    <option value="reschedule">Muốn đổi lịch hẹn khác</option>
+                                                    <option value="other">Lý do khác</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="form-group" id="otherReasonGroup" style="display: none;">
+                                                <label for="otherReason">Lý do khác:</label>
+                                                <textarea id="otherReason" name="otherReason" class="form-control" rows="3"></textarea>
+                                            </div>
+                                            
+                                            <div class="form-actions">
+                                                <button type="button" class="btn-outline" data-dismiss="modal">Đóng</button>
+                                                <button type="submit" class="btn-danger">Xác nhận hủy</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fallback nếu không có dữ liệu -->
+                        <div class="order-item" th:if="${orders == null || orders.empty}">
+                            <div class="order-header">
+                                <div class="order-id">
+                                    <span>Mã đơn:</span>
+                                    <strong>BK-1001</strong>
+                                </div>
+                                <div class="order-status">
+                                    <span class="status status-pending">Chờ xác nhận</span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-details">
+                                <div class="order-child">
+                                    <h4>Trẻ:</h4>
+                                    <p>Nguyễn Văn An</p>
+                                </div>
+                                
+                                <div class="order-service">
+                                    <h4>Dịch vụ:</h4>
+                                    <p>Tiêm vaccine Viêm gan B</p>
+                                </div>
+                                
+                                <div class="order-datetime">
+                                    <h4>Ngày giờ:</h4>
+                                    <p>30/06/2023 09:00</p>
+                                </div>
+                            </div>
+                            
+                            <div class="order-actions">
+                                <a href="/orders/1" class="btn-outline">Xem chi tiết</a>
+                                <button class="btn-danger" data-toggle="modal" data-target="#cancelOrderModal-1">Hủy đơn</button>
+                            </div>
+                        </div>
+                        
+                        <div class="order-item" th:if="${orders == null || orders.empty}">
+                            <div class="order-header">
+                                <div class="order-id">
+                                    <span>Mã đơn:</span>
+                                    <strong>BK-1002</strong>
+                                </div>
+                                <div class="order-status">
+                                    <span class="status status-confirmed">Đã xác nhận</span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-details">
+                                <div class="order-child">
+                                    <h4>Trẻ:</h4>
+                                    <p>Nguyễn Văn An</p>
+                                </div>
+                                
+                                <div class="order-service">
+                                    <h4>Dịch vụ:</h4>
+                                    <p>Gói tiêm chủng cơ bản</p>
+                                </div>
+                                
+                                <div class="order-datetime">
+                                    <h4>Ngày giờ:</h4>
+                                    <p>05/07/2023 14:30</p>
+                                </div>
+                            </div>
+                            
+                            <div class="order-actions">
+                                <a href="/orders/2" class="btn-outline">Xem chi tiết</a>
+                                <a href="/orders/2/payment" class="btn-primary">Thanh toán</a>
+                                <button class="btn-danger" data-toggle="modal" data-target="#cancelOrderModal-2">Hủy đơn</button>
+                            </div>
+                        </div>
+                        
+                        <div class="no-orders" th:if="${orders != null && orders.empty}">
+                            <div class="no-data-message">
+                                <i class="fas fa-calendar-times"></i>
+                                <h3>Chưa có đơn đặt lịch nào</h3>
+                                <p>Bạn chưa có đơn đặt lịch tiêm chủng nào. Hãy đặt lịch ngay để chăm sóc sức khỏe cho trẻ.</p>
+                                <a href="/schedule/booking" class="btn-primary">Đặt lịch ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+    
+    <script src="/js/main.js"></script>
+    <script>
+        // Toggle other reason field
+        document.addEventListener('DOMContentLoaded', function() {
+            const cancelReasons = document.querySelectorAll('[id^="cancelReason"]');
+            
+            cancelReasons.forEach(function(select) {
+                select.addEventListener('change', function() {
+                    const modalId = this.closest('.modal').id;
+                    const otherReasonGroup = document.querySelector(`#${modalId} [id^="otherReasonGroup"]`);
+                    
+                    if (this.value === 'other') {
+                        otherReasonGroup.style.display = 'block';
+                    } else {
+                        otherReasonGroup.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Modal handling
+            const modalToggles = document.querySelectorAll('[data-toggle="modal"]');
+            const modalCloses = document.querySelectorAll('[data-dismiss="modal"]');
+            
+            modalToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const modal = document.querySelector(targetId);
+                    if (modal) {
+                        modal.style.display = 'block';
+                    }
+                });
+            });
+            
+            modalCloses.forEach(close => {
+                close.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
