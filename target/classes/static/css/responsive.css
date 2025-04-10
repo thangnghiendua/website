@@ -1,0 +1,351 @@
+/* ===== RESPONSIVE STYLES ===== */
+
+/* Large devices (desktops, less than 1200px) */
+@media (max-width: 1199.98px) {
+  .container {
+    max-width: 960px;
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  .children-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Medium devices (tablets, less than 992px) */
+@media (max-width: 991.98px) {
+  .container {
+    max-width: 720px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  .intro-content {
+    flex-direction: column;
+  }
+
+  .intro-image {
+    margin-bottom: 30px;
+  }
+
+  .booking-container {
+    flex-direction: column;
+  }
+
+  .booking-summary {
+    position: static;
+  }
+
+  .children-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    margin-bottom: 30px;
+  }
+
+  .sidebar-menu {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .sidebar-menu a {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-bottom: none;
+    border-right: 1px solid var(--border-color);
+  }
+
+  .sidebar-menu a:last-child {
+    border-right: none;
+  }
+
+  .sidebar-menu i {
+    margin-right: 5px;
+  }
+}
+
+/* Small devices (landscape phones, less than 768px) */
+@media (max-width: 767.98px) {
+  .container {
+    max-width: 540px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .logo {
+    margin-bottom: 15px;
+  }
+
+  .main-nav {
+    margin-bottom: 15px;
+  }
+
+  .main-nav ul {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .main-nav li {
+    margin: 5px 10px;
+  }
+
+  .user-actions {
+    justify-content: center;
+  }
+
+  .banner {
+    padding: 80px 0;
+  }
+
+  .banner h1 {
+    font-size: 36px;
+  }
+
+  .banner p {
+    font-size: 18px;
+  }
+
+  .services-grid,
+  .benefits-grid,
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+
+  .children-list,
+  .service-list {
+    grid-template-columns: 1fr;
+  }
+
+  .children-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-progress {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .step {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .step:not(:last-child):after {
+    display: none;
+  }
+
+  .step-number {
+    margin-bottom: 0;
+    margin-right: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .time-slots {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .order-details {
+    flex-direction: column;
+  }
+
+  .order-child,
+  .order-service,
+  .order-datetime {
+    margin-bottom: 10px;
+  }
+
+  .calendar-grid {
+    display: none;
+  }
+
+  .mobile-calendar {
+    display: block;
+  }
+}
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+  .container {
+    padding: 0 20px;
+  }
+
+  .banner h1 {
+    font-size: 28px;
+  }
+
+  .banner p {
+    font-size: 16px;
+  }
+
+  .auth-container {
+    padding: 20px;
+  }
+
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-status {
+    margin-top: 10px;
+  }
+
+  .service-detail-info {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .testimonial-slider {
+    gap: 15px;
+  }
+
+  .testimonial-item {
+    flex: 0 0 100%;
+    padding: 20px;
+  }
+}
+
+/* Mobile Menu */
+@media (max-width: 991.98px) {
+  .mobile-menu-toggle {
+    display: block;
+    cursor: pointer;
+    font-size: 24px;
+  }
+
+  .main-nav {
+    display: none;
+    width: 100%;
+  }
+
+  .main-nav.active {
+    display: block;
+  }
+
+  .main-nav ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .main-nav li {
+    margin: 10px 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .dropdown-menu {
+    position: static;
+    box-shadow: none;
+    width: 100%;
+    display: none;
+  }
+
+  .dropdown:hover .dropdown-menu {
+    display: none;
+  }
+
+  .dropdown.active .dropdown-menu {
+    display: block;
+  }
+}
+
+/* Hide desktop calendar on mobile and show mobile calendar */
+@media (max-width: 767.98px) {
+  .desktop-calendar {
+    display: none;
+  }
+
+  .mobile-calendar {
+    display: block;
+  }
+
+  .mobile-calendar-event {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: white;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+  }
+
+  .mobile-calendar-date {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .mobile-calendar-day {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-weight: bold;
+  }
+
+  .mobile-calendar-info {
+    font-size: 14px;
+    color: var(--light-text);
+  }
+
+  .mobile-calendar-title {
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+
+  .mobile-calendar-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 10px;
+  }
+
+  .mobile-calendar-status.upcoming {
+    background-color: var(--accent-color);
+    color: white;
+  }
+
+  .mobile-calendar-status.completed {
+    background-color: var(--secondary-color);
+    color: white;
+  }
+}

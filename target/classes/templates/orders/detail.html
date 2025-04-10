@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi tiết đơn đặt lịch - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="container">
+        <h1>Chi tiết đơn đặt lịch</h1>
+      </div>
+    </div>
+
+    <!-- Order Detail Section -->
+    <section class="order-detail-section">
+      <div class="container">
+        <div class="children-container">
+          <!-- Sidebar -->
+          <div th:replace="fragments/sidebar :: sidebar"></div>
+
+          <!-- Main Content -->
+          <div class="main-content">
+            <div th:if="${param.success}" class="alert alert-success">
+              Thao tác thành công!
+            </div>
+
+            <!-- Order Status -->
+            <div class="order-status">
+              <div class="order-id">
+                <span>Mã đơn: </span>
+                <strong th:text="${order?.id ?: 'BK-123456'}">BK-123456</strong>
+              </div>
+
+              <div class="order-status-badge" th:if="${order != null}">
+                <span
+                  th:class="'status status-' + ${order.status}"
+                  th:text="${order.statusText}"
+                  >Đã xác nhận</span
+                >
+              </div>
+              <div class="order-status-badge" th:if="${order == null}">
+                <span class="status status-confirmed">Đã xác nhận</span>
+              </div>
+            </div>
+
+            <!-- Order Timeline -->
+            <div class="order-timeline">
+              <div
+                class="timeline-item"
+                th:classappend="${order?.status == 'pending' || order?.status == 'confirmed' || order?.status == 'completed' || order == null ? 'active' : ''}"
+              >
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div
+                    class="timeline-date"
+                    th:text="${order?.createdAt != null ? #dates.format(order.createdAt, 'dd/MM/yyyy HH:mm') : '28/06/2023 09:15'}"
+                  >
+                    28/06/2023 09:15
+                  </div>
+                  <div class="timeline-title">Đặt lịch</div>
+                  <div class="timeline-description">
+                    Đơn đặt lịch của bạn đã được tạo thành công.
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="timeline-item"
+                th:classappend="${order?.status == 'confirmed' || order?.status == 'completed' || order == null ? 'active' : ''}"
+              >
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div
+                    class="timeline-date"
+                    th:text="${order?.confirmedAt != null ? #dates.format(order.confirmedAt, 'dd/MM/yyyy HH:mm') : '28/06/2023 10:30'}"
+                  >
+                    28/06/2023 10:30
+                  </div>
+                  <div class="timeline-title">Xác nhận</div>
+                  <div class="timeline-description">
+                    Đơn đặt lịch của bạn đã được xác nhận.
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="timeline-item"
+                th:classappend="${order?.status == 'completed' ? 'active' : ''}"
+              >
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div
+                    class="timeline-date"
+                    th:text="${order?.completedAt != null ? #dates.format(order.completedAt, 'dd/MM/yyyy HH:mm') : '--/--/---- --:--'}"
+                  >
+                    --/--/---- --:--
+                  </div>
+                  <div class="timeline-title">Hoàn thành</div>
+                  <div class="timeline-description">
+                    Tiêm chủng đã được thực hiện thành công.
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="timeline-item"
+                th:if="${order?.status == 'cancelled'}"
+              >
+                <div class="timeline-point"></div>
+                <div class="timeline-content">
+                  <div
+                    class="timeline-date"
+                    th:text="${order?.cancelledAt != null ? #dates.format(order.cancelledAt, 'dd/MM/yyyy HH:mm') : '--/--/---- --:--'}"
+                  >
+                    29/06/2023 11:45
+                  </div>
+                  <div class="timeline-title">Hủy</div>
+                  <div
+                    class="timeline-description"
+                    th:text="${order?.cancelReason ?: 'Đơn đặt lịch đã bị hủy.'}"
+                  >
+                    Đơn đặt lịch đã bị hủy.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Details -->
+            <div class="order-details">
+              <h3>Thông tin đặt lịch</h3>
+
+              <div class="details-grid">
+                <div class="details-item">
+                  <div class="details-label">Trẻ:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.child?.name ?: 'Nguyễn Văn An'}"
+                  >
+                    Nguyễn Văn An
+                  </div>
+                </div>
+
+                <div class="details-item">
+                  <div class="details-label">Tuổi:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.child?.ageDescription ?: '1 tuổi 6 tháng'}"
+                  >
+                    1 tuổi 6 tháng
+                  </div>
+                </div>
+
+                <div class="details-item">
+                  <div class="details-label">Dịch vụ:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.service?.name ?: 'Tiêm vaccine Viêm gan B'}"
+                  >
+                    Tiêm vaccine Viêm gan B
+                  </div>
+                </div>
+
+                <div class="details-item">
+                  <div class="details-label">Ngày giờ:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.datetime != null ? #dates.format(order.datetime, 'EEEE, dd/MM/yyyy HH:mm') : 'Thứ Sáu, 30/06/2023 09:00'}"
+                  >
+                    Thứ Sáu, 30/06/2023 09:00
+                  </div>
+                </div>
+
+                <div class="details-item">
+                  <div class="details-label">Trạng thái thanh toán:</div>
+                  <div class="details-value">
+                    <span
+                      th:if="${order?.isPaid}"
+                      class="status status-completed"
+                      >Đã thanh toán</span
+                    >
+                    <span
+                      th:unless="${order?.isPaid}"
+                      class="status status-pending"
+                      >Chưa thanh toán</span
+                    >
+                  </div>
+                </div>
+
+                <div class="details-item">
+                  <div class="details-label">Phương thức thanh toán:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.paymentMethod != null ? (order.paymentMethod == 'cash' ? 'Thanh toán tại cơ sở' : (order.paymentMethod == 'banking' ? 'Chuyển khoản ngân hàng' : 'Ví điện tử')) : 'Thanh toán tại cơ sở'}"
+                  >
+                    Thanh toán tại cơ sở
+                  </div>
+                </div>
+              </div>
+
+              <div class="price-details">
+                <div class="price-item">
+                  <span>Giá dịch vụ:</span>
+                  <span
+                    th:text="${order?.service?.price != null ? #numbers.formatDecimal(order.service.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : '300.000 VNĐ'}"
+                    >300.000 VNĐ</span
+                  >
+                </div>
+
+                <div
+                  class="price-item discount"
+                  th:if="${order?.discount != null && order.discount > 0}"
+                >
+                  <span>Giảm giá:</span>
+                  <span
+                    th:text="${#numbers.formatDecimal(order.discount, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"
+                    >-50.000 VNĐ</span
+                  >
+                </div>
+
+                <div class="price-item total">
+                  <span>Tổng cộng:</span>
+                  <span
+                    th:text="${order?.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : '300.000 VNĐ'}"
+                    >300.000 VNĐ</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Vaccination Results -->
+            <div
+              class="vaccination-results"
+              th:if="${order?.status == 'completed'}"
+            >
+              <h3>Kết quả tiêm chủng</h3>
+
+              <div class="details-grid">
+                <div class="details-item">
+                  <div class="details-label">Thời gian tiêm:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.vaccinationTime != null ? #dates.format(order.vaccinationTime, 'dd/MM/yyyy HH:mm') : '30/06/2023 09:15'}"
+                  >
+                    30/06/2023 09:15
+                  </div>
+                </div>
+
+                <div class="details-item">
+                  <div class="details-label">Bác sĩ:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.doctor ?: 'BS. Nguyễn Thị Hương'}"
+                  >
+                    BS. Nguyễn Thị Hương
+                  </div>
+                </div>
+
+                <div class="details-item">
+                  <div class="details-label">Lô vaccine:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.vaccineBatch ?: 'VGB-2023-06-01'}"
+                  >
+                    VGB-2023-06-01
+                  </div>
+                </div>
+
+                <div class="details-item">
+                  <div class="details-label">Hạn sử dụng:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.vaccineExpiry != null ? #dates.format(order.vaccineExpiry, 'dd/MM/yyyy') : '01/06/2025'}"
+                  >
+                    01/06/2025
+                  </div>
+                </div>
+
+                <div class="details-item full-width">
+                  <div class="details-label">Ghi chú:</div>
+                  <div
+                    class="details-value"
+                    th:text="${order?.notes ?: 'Tiêm chủng diễn ra bình thường, không có phản ứng bất thường.'}"
+                  >
+                    Tiêm chủng diễn ra bình thường, không có phản ứng bất
+                    thường.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Post-vaccination Response Form -->
+            <div
+              class="vaccination-response"
+              th:if="${order?.status == 'completed' && (order?.responseSubmitted == null || !order.responseSubmitted)}"
+            >
+              <h3>Phản ứng sau tiêm</h3>
+              <p>
+                Vui lòng ghi nhận các phản ứng sau tiêm (nếu có) để bác sĩ có
+                thể theo dõi tốt hơn.
+              </p>
+
+              <form
+                th:action="@{/orders/{id}/response(id=${order?.id})}"
+                action="/orders/123/response"
+                method="post"
+                class="response-form"
+              >
+                <div class="form-group">
+                  <label>Có phản ứng sau tiêm không?</label>
+                  <div class="radio-group">
+                    <div class="radio-item">
+                      <input
+                        type="radio"
+                        id="responseYes"
+                        name="hasResponse"
+                        value="true"
+                      />
+                      <label for="responseYes">Có</label>
+                    </div>
+                    <div class="radio-item">
+                      <input
+                        type="radio"
+                        id="responseNo"
+                        name="hasResponse"
+                        value="false"
+                        checked
+                      />
+                      <label for="responseNo">Không</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="responseDetails" style="display: none">
+                  <div class="form-group">
+                    <label for="responseTime">Thời gian xuất hiện:</label>
+                    <input
+                      type="datetime-local"
+                      id="responseTime"
+                      name="responseTime"
+                      class="form-control"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Các triệu chứng:</label>
+                    <div class="checkbox-group">
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="symptom1"
+                          name="symptoms"
+                          value="fever"
+                        />
+                        <label for="symptom1">Sốt</label>
+                      </div>
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="symptom2"
+                          name="symptoms"
+                          value="redness"
+                        />
+                        <label for="symptom2">Đỏ tại chỗ tiêm</label>
+                      </div>
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="symptom3"
+                          name="symptoms"
+                          value="swelling"
+                        />
+                        <label for="symptom3">Sưng tại chỗ tiêm</label>
+                      </div>
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="symptom4"
+                          name="symptoms"
+                          value="pain"
+                        />
+                        <label for="symptom4">Đau tại chỗ tiêm</label>
+                      </div>
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="symptom5"
+                          name="symptoms"
+                          value="fatigue"
+                        />
+                        <label for="symptom5">Mệt mỏi</label>
+                      </div>
+                      <div class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id="symptom6"
+                          name="symptoms"
+                          value="rash"
+                        />
+                        <label for="symptom6">Phát ban</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="responseDescription">Mô tả chi tiết:</label>
+                    <textarea
+                      id="responseDescription"
+                      name="responseDescription"
+                      class="form-control"
+                      rows="4"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary">
+                    Gửi phản hồi
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Review Form -->
+            <div
+              class="order-review"
+              th:if="${order?.status == 'completed' && (order?.reviewSubmitted == null || !order.reviewSubmitted)}"
+            >
+              <h3>Đánh giá dịch vụ</h3>
+              <p>
+                Hãy chia sẻ trải nghiệm của bạn về dịch vụ tiêm chủng của chúng
+                tôi.
+              </p>
+
+              <form
+                th:action="@{/orders/{id}/review(id=${order?.id})}"
+                action="/orders/123/review"
+                method="post"
+                class="review-form"
+              >
+                <div class="form-group">
+                  <label>Mức độ hài lòng:</label>
+                  <div class="rating-input">
+                    <input type="radio" id="star5" name="rating" value="5" />
+                    <label for="star5" title="5 sao"
+                      ><i class="fas fa-star"></i
+                    ></label>
+                    <input type="radio" id="star4" name="rating" value="4" />
+                    <label for="star4" title="4 sao"
+                      ><i class="fas fa-star"></i
+                    ></label>
+                    <input type="radio" id="star3" name="rating" value="3" />
+                    <label for="star3" title="3 sao"
+                      ><i class="fas fa-star"></i
+                    ></label>
+                    <input type="radio" id="star2" name="rating" value="2" />
+                    <label for="star2" title="2 sao"
+                      ><i class="fas fa-star"></i
+                    ></label>
+                    <input type="radio" id="star1" name="rating" value="1" />
+                    <label for="star1" title="1 sao"
+                      ><i class="fas fa-star"></i
+                    ></label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="reviewComment">Nhận xét:</label>
+                  <textarea
+                    id="reviewComment"
+                    name="comment"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Chia sẻ trải nghiệm của bạn..."
+                  ></textarea>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary">
+                    Gửi đánh giá
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Order Actions -->
+            <div class="order-actions">
+              <a href="/orders/list" class="btn-outline">Quay lại danh sách</a>
+
+              <div
+                th:if="${order?.status == 'pending' || order?.status == 'confirmed' || order == null}"
+              >
+                <button
+                  class="btn-danger"
+                  data-toggle="modal"
+                  data-target="#cancelOrderModal"
+                >
+                  Hủy đơn
+                </button>
+              </div>
+
+              <div th:if="${order?.isPaid == null || !order.isPaid}">
+                <a
+                  th:href="@{/orders/{id}/payment(id=${order?.id})}"
+                  href="/orders/123/payment"
+                  class="btn-primary"
+                  >Thanh toán</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cancel Order Modal -->
+    <div class="modal" id="cancelOrderModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Hủy đơn đặt lịch</h3>
+          <span class="modal-close" data-dismiss="modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form
+            th:action="@{/orders/{id}/cancel(id=${order?.id})}"
+            action="/orders/123/cancel"
+            method="post"
+          >
+            <div class="form-group">
+              <label for="cancelReason">Lý do hủy:</label>
+              <select
+                id="cancelReason"
+                name="cancelReason"
+                class="form-control"
+                required
+              >
+                <option value="">-- Chọn lý do --</option>
+                <option value="schedule_conflict">
+                  Lịch bận không thể đến
+                </option>
+                <option value="child_sick">Trẻ bị ốm</option>
+                <option value="reschedule">Muốn đổi lịch hẹn khác</option>
+                <option value="other">Lý do khác</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="otherReasonGroup" style="display: none">
+              <label for="otherReason">Lý do khác:</label>
+              <textarea
+                id="otherReason"
+                name="otherReason"
+                class="form-control"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-outline" data-dismiss="modal">
+                Đóng
+              </button>
+              <button type="submit" class="btn-danger">Xác nhận hủy</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+    <script>
+      // Toggle response details based on radio selection
+      document.addEventListener("DOMContentLoaded", function () {
+        const responseYes = document.getElementById("responseYes");
+        const responseNo = document.getElementById("responseNo");
+        const responseDetails = document.getElementById("responseDetails");
+
+        if (responseYes && responseNo && responseDetails) {
+          responseYes.addEventListener("change", function () {
+            if (this.checked) {
+              responseDetails.style.display = "block";
+            }
+          });
+
+          responseNo.addEventListener("change", function () {
+            if (this.checked) {
+              responseDetails.style.display = "none";
+            }
+          });
+        }
+
+        // Cancel reason other toggle
+        const cancelReason = document.getElementById("cancelReason");
+        const otherReasonGroup = document.getElementById("otherReasonGroup");
+
+        if (cancelReason && otherReasonGroup) {
+          cancelReason.addEventListener("change", function () {
+            if (this.value === "other") {
+              otherReasonGroup.style.display = "block";
+            } else {
+              otherReasonGroup.style.display = "none";
+            }
+          });
+        }
+
+        // Modal handling
+        const modalToggles = document.querySelectorAll('[data-toggle="modal"]');
+        const modalCloses = document.querySelectorAll('[data-dismiss="modal"]');
+
+        modalToggles.forEach((toggle) => {
+          toggle.addEventListener("click", function () {
+            const targetId = this.getAttribute("data-target");
+            const modal = document.querySelector(targetId);
+            if (modal) {
+              modal.style.display = "block";
+            }
+          });
+        });
+
+        modalCloses.forEach((close) => {
+          close.addEventListener("click", function () {
+            const modal = this.closest(".modal");
+            if (modal) {
+              modal.style.display = "none";
+            }
+          });
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener("click", function (event) {
+          if (event.target.classList.contains("modal")) {
+            event.target.style.display = "none";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

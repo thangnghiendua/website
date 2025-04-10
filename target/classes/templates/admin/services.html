@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dịch vụ tiêm chủng - Trung tâm Tiêm chủng</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block th:replace="fragments/responsive-styles :: responsive-styles"></th:block>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1>Dịch vụ tiêm chủng</h1>
+        </div>
+    </div>
+    
+    <!-- Services Section -->
+    <section class="services-section">
+        <div class="container">
+            <!-- Filter -->
+            <div class="services-filter">
+                <div class="filter-group">
+                    <label for="ageFilter">Độ tuổi:</label>
+                    <select id="ageFilter" class="form-control">
+                        <option value="">Tất cả</option>
+                        <option value="0-6">0-6 tháng</option>
+                        <option value="7-12">7-12 tháng</option>
+                        <option value="1-2">1-2 tuổi</option>
+                        <option value="2-5">2-5 tuổi</option>
+                        <option value="6+">6+ tuổi</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="typeFilter">Loại dịch vụ:</label>
+                    <select id="typeFilter" class="form-control">
+                        <option value="">Tất cả</option>
+                        <option value="single">Tiêm lẻ</option>
+                        <option value="package">Gói tiêm chủng</option>
+                        <option value="custom">Cá thể hóa</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="priceFilter">Giá:</label>
+                    <select id="priceFilter" class="form-control">
+                        <option value="">Tất cả</option>
+                        <option value="0-500000">Dưới 500.000đ</option>
+                        <option value="500000-1000000">500.000đ - 1.000.000đ</option>
+                        <option value="1000000-2000000">1.000.000đ - 2.000.000đ</option>
+                        <option value="2000000+">Trên 2.000.000đ</option>
+                    </select>
+                </div>
+                
+                <button class="btn-filter">
+                    <i class="fas fa-filter"></i> Lọc
+                </button>
+            </div>
+            
+            <!-- Single Vaccines -->
+            <div id="single-vaccines" class="service-section">
+                <h2>Tiêm lẻ</h2>
+                <p class="section-description">Các loại vaccine đơn lẻ phòng ngừa các bệnh cụ thể.</p>
+                
+                <div class="services-grid">
+                    <div class="service-card" th:each="service : ${singleVaccines}">
+                        <div class="service-image">
+                            <img th:src="${service.imageUrl}" alt="Vaccine">
+                        </div>
+                        <div class="service-info">
+                            <h3 th:text="${service.name}">Vaccine Viêm gan B</h3>
+                            <p th:text="${service.shortDescription}">Phòng ngừa bệnh viêm gan B.</p>
+                            <div class="service-price">
+                                <span th:text="${#numbers.formatDecimal(service.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">300.000 VNĐ</span>
+                            </div>
+                            <a th:href="@{/services/{id}(id=${service.id})}" class="btn-detail">Xem chi tiết</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Fallback nếu không có dữ liệu từ controller -->
+                    <div class="service-card" th:if="${singleVaccines == null || singleVaccines.empty}">
+                        <div class="service-image">
+                            <img src="/images/vaccine1.jpg" alt="Vaccine Viêm gan B">
+                        </div>
+                        <div class="service-info">
+                            <h3>Vaccine Viêm gan B</h3>
+                            <p>Phòng ngừa bệnh viêm gan B.</p>
+                            <div class="service-price">
+                                <span>300.000 VNĐ</span>
+                            </div>
+                            <a href="/services/1" class="btn-detail">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Basic Packages -->
+            <div id="basic-packages" class="service-section">
+                <h2>Gói tiêm chủng cơ bản</h2>
+                <p class="section-description">Gói vaccine cơ bản phòng ngừa các bệnh phổ biến cho trẻ.</p>
+                
+                <div class="services-grid">
+                    <div class="service-card" th:each="service : ${basicPackages}">
+                        <div class="service-image">
+                            <img th:src="${service.imageUrl}" alt="Gói tiêm chủng">
+                        </div>
+                        <div class="service-info">
+                            <h3 th:text="${service.name}">Gói tiêm chủng cơ bản 0-12 tháng</h3>
+                            <p th:text="${service.shortDescription}">Gói vaccine phòng ngừa các bệnh phổ biến cho trẻ từ 0-12 tháng tuổi.</p>
+                            <div class="service-price">
+                                <span th:text="${#numbers.formatDecimal(service.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">1.200.000 VNĐ</span>
+                            </div>
+                            <a th:href="@{/services/{id}(id=${service.id})}" class="btn-detail">Xem chi tiết</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Fallback nếu không có dữ liệu từ controller -->
+                    <div class="service-card" th:if="${basicPackages == null || basicPackages.empty}">
+                        <div class="service-image">
+                            <img src="/images/package1.jpg" alt="Gói tiêm chủng cơ bản">
+                        </div>
+                        <div class="service-info">
+                            <h3>Gói tiêm chủng cơ bản 0-12 tháng</h3>
+                            <p>Gói vaccine phòng ngừa các bệnh phổ biến cho trẻ từ 0-12 tháng tuổi.</p>
+                            <div class="service-price">
+                                <span>1.200.000 VNĐ</span>
+                            </div>
+                            <a href="/services/101" class="btn-detail">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Custom Packages -->
+            <div id="custom-packages" class="service-section">
+                <h2>Tiêm chủng cá thể hóa</h2>
+                <p class="section-description">Lịch tiêm chủng được thiết kế riêng phù hợp với tình trạng sức khỏe của trẻ.</p>
+                
+                <div class="custom-package-info">
+                    <div class="custom-package-image">
+                        <img src="/images/custom-package.jpg" alt="Tiêm chủng cá thể hóa">
+                    </div>
+                    <div class="custom-package-content">
+                        <h3>Tiêm chủng theo nhu cầu riêng</h3>
+                        <p>Tại Trung tâm Tiêm chủng, chúng tôi hiểu rằng mỗi trẻ có nhu cầu sức khỏe khác nhau. Dịch vụ tiêm chủng cá thể hóa của chúng tôi được thiết kế để đáp ứng nhu cầu cụ thể của từng trẻ.</p>
+                        
+                        <a href="/schedule/booking?type=custom" class="btn-cta">Đặt lịch tư vấn</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>

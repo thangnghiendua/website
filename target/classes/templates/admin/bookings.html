@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý đặt lịch - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <div th:replace="fragments/admin-sidebar :: admin-sidebar"></div>
+
+      <!-- Main Content -->
+      <div class="dashboard-main">
+        <!-- Header -->
+        <div class="dashboard-header">
+          <button class="toggle-sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <div class="dashboard-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Tìm kiếm đơn đặt lịch..." />
+          </div>
+
+          <div class="dashboard-actions">
+            <div class="notifications-dropdown">
+              <div class="notifications-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notifications-badge">3</span>
+              </div>
+
+              <div class="notifications-menu">
+                <div class="notifications-header">
+                  <span>Thông báo (3)</span>
+                  <a href="#">Đánh dấu tất cả là đã đọc</a>
+                </div>
+
+                <div class="notifications-list">
+                  <div class="notification-item">
+                    <div class="notification-icon">
+                      <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="notification-content">
+                      <div class="notification-title">Đơn đặt lịch mới</div>
+                      <p>Nguyễn Văn A đã đặt lịch tiêm chủng cho bé An</p>
+                      <div class="notification-time">30 phút trước</div>
+                    </div>
+                  </div>
+
+                  <div class="notification-item">
+                    <div class="notification-icon">
+                      <i class="fas fa-star"></i>
+                    </div>
+                    <div class="notification-content">
+                      <div class="notification-title">Đánh giá mới</div>
+                      <p>Trần Thị B đã đánh giá 5 sao cho dịch vụ</p>
+                      <div class="notification-time">2 giờ trước</div>
+                    </div>
+                  </div>
+
+                  <div class="notification-item">
+                    <div class="notification-icon">
+                      <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="notification-content">
+                      <div class="notification-title">Khách hàng mới</div>
+                      <p>Lê Văn C đã đăng ký tài khoản mới</p>
+                      <div class="notification-time">1 ngày trước</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="notifications-footer">
+                  <a href="#">Xem tất cả thông báo</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-dropdown">
+              <div class="admin-dropdown-toggle">
+                <img src="/images/admin-avatar.jpg" alt="Admin" />
+                <span th:text="${session.admin?.fullName}">Admin</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+
+              <div class="admin-dropdown-menu">
+                <a href="/admin/profile"> <i class="fas fa-user"></i> Hồ sơ </a>
+                <a href="/admin/settings">
+                  <i class="fas fa-cog"></i> Cài đặt
+                </a>
+                <a href="/logout">
+                  <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="dashboard-content">
+          <h1>Quản lý đặt lịch</h1>
+
+          <div class="booking-management">
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+              <div class="filter-group">
+                <label for="statusFilter">Trạng thái:</label>
+                <select id="statusFilter" class="form-control">
+                  <option value="">Tất cả</option>
+                  <option value="pending">Chờ xác nhận</option>
+                  <option value="confirmed">Đã xác nhận</option>
+                  <option value="completed">Đã hoàn thành</option>
+                  <option value="cancelled">Đã hủy</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="dateFilter">Ngày:</label>
+                <input type="date" id="dateFilter" class="form-control" />
+              </div>
+
+              <div class="filter-group">
+                <label for="serviceFilter">Dịch vụ:</label>
+                <select id="serviceFilter" class="form-control">
+                  <option value="">Tất cả</option>
+                  <option value="1">Tiêm lẻ</option>
+                  <option value="2">Gói tiêm chủng</option>
+                  <option value="3">Cá thể hóa</option>
+                </select>
+              </div>
+
+              <button class="btn-primary">
+                <i class="fas fa-filter"></i> Lọc
+              </button>
+
+              <button class="btn-outline">
+                <i class="fas fa-sync-alt"></i> Đặt lại
+              </button>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="bulk-actions">
+              <form class="bulk-action-form">
+                <select class="form-control bulk-action-select">
+                  <option value="">Hành động hàng loạt</option>
+                  <option value="confirm">Xác nhận</option>
+                  <option value="complete">Đánh dấu hoàn thành</option>
+                  <option value="cancel">Hủy</option>
+                </select>
+                <button
+                  type="button"
+                  class="btn-outline bulk-action-btn"
+                  disabled
+                >
+                  Thực hiện
+                </button>
+              </form>
+
+              <a href="/admin/bookings/calendar" class="btn-outline">
+                <i class="fas fa-calendar-alt"></i> Xem lịch
+              </a>
+
+              <button class="btn-outline">
+                <i class="fas fa-file-export"></i> Xuất Excel
+              </button>
+            </div>
+
+            <!-- Bookings Table -->
+            <div class="table-container">
+              <div class="table-responsive">
+                <table class="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        <input type="checkbox" class="select-all-checkbox" />
+                      </th>
+                      <th>ID</th>
+                      <th>Khách hàng</th>
+                      <th>Trẻ</th>
+                      <th>Dịch vụ</th>
+                      <th>Ngày giờ</th>
+                      <th>Trạng thái</th>
+                      <th>Thanh toán</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:each="booking : ${bookings}">
+                      <td>
+                        <input
+                          type="checkbox"
+                          class="item-checkbox"
+                          th:value="${booking.id}"
+                        />
+                      </td>
+                      <td th:text="${booking.id}">BK-001</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            th:src="${booking.user.avatarUrl}"
+                            src="/images/avatar1.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div>
+                            <div
+                              class="user-name"
+                              th:text="${booking.user.name}"
+                            >
+                              Nguyễn Văn A
+                            </div>
+                            <div
+                              class="user-email"
+                              th:text="${booking.user.email}"
+                            >
+                              nguyenvana@gmail.com
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td th:text="${booking.child.name}">Nguyễn An</td>
+                      <td th:text="${booking.service.name}">Tiêm Viêm gan B</td>
+                      <td
+                        th:text="${#dates.format(booking.datetime, 'dd/MM/yyyy HH:mm')}"
+                      >
+                        30/06/2023 09:00
+                      </td>
+                      <td>
+                        <span
+                          th:class="'status status-' + ${booking.status}"
+                          th:text="${booking.statusText}"
+                          class="status status-pending"
+                          >Chờ xác nhận</span
+                        >
+                      </td>
+                      <td>
+                        <span
+                          th:class="'status ' + (${booking.isPaid} ? 'status-completed' : 'status-pending')"
+                          th:text="${booking.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}"
+                          class="status status-pending"
+                          >Chưa thanh toán</span
+                        >
+                      </td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            th:href="@{/admin/bookings/{id}(id=${booking.id})}"
+                            href="/admin/bookings/1"
+                            class="btn-table btn-view"
+                            title="Xem chi tiết"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a
+                            th:href="@{/admin/bookings/{id}/edit(id=${booking.id})}"
+                            href="/admin/bookings/1/edit"
+                            class="btn-table btn-edit"
+                            title="Sửa"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <a
+                            th:href="@{/admin/bookings/{id}/vaccination(id=${booking.id})}"
+                            href="/admin/bookings/1/vaccination"
+                            class="btn-table btn-primary"
+                            title="Ghi nhận tiêm chủng"
+                          >
+                            <i class="fas fa-syringe"></i>
+                          </a>
+                          <button
+                            class="btn-table btn-delete"
+                            th:data-id="${booking.id}"
+                            data-confirm="Bạn có chắc chắn muốn hủy đơn đặt lịch này?"
+                            title="Hủy đơn"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <!-- Fallback nếu không có dữ liệu -->
+                    <tr th:if="${bookings == null || bookings.empty}">
+                      <td>
+                        <input
+                          type="checkbox"
+                          class="item-checkbox"
+                          value="1"
+                        />
+                      </td>
+                      <td>BK-001</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            src="/images/avatar1.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div>
+                            <div class="user-name">Nguyễn Văn A</div>
+                            <div class="user-email">nguyenvana@gmail.com</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>Nguyễn An</td>
+                      <td>Tiêm Viêm gan B</td>
+                      <td>30/06/2023 09:00</td>
+                      <td>
+                        <span class="status status-pending">Chờ xác nhận</span>
+                      </td>
+                      <td>
+                        <span class="status status-pending"
+                          >Chưa thanh toán</span
+                        >
+                      </td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/admin/bookings/1"
+                            class="btn-table btn-view"
+                            title="Xem chi tiết"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a
+                            href="/admin/bookings/1/edit"
+                            class="btn-table btn-edit"
+                            title="Sửa"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <a
+                            href="/admin/bookings/1/vaccination"
+                            class="btn-table btn-primary"
+                            title="Ghi nhận tiêm chủng"
+                          >
+                            <i class="fas fa-syringe"></i>
+                          </a>
+                          <button
+                            class="btn-table btn-delete"
+                            data-id="1"
+                            data-confirm="Bạn có chắc chắn muốn hủy đơn đặt lịch này?"
+                            title="Hủy đơn"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr th:if="${bookings == null || bookings.empty}">
+                      <td>
+                        <input
+                          type="checkbox"
+                          class="item-checkbox"
+                          value="2"
+                        />
+                      </td>
+                      <td>BK-002</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            src="/images/avatar2.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div>
+                            <div class="user-name">Trần Thị B</div>
+                            <div class="user-email">tranthib@gmail.com</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>Trần Bình</td>
+                      <td>Gói tiêm chủng cơ bản</td>
+                      <td>01/07/2023 14:30</td>
+                      <td>
+                        <span class="status status-confirmed">Đã xác nhận</span>
+                      </td>
+                      <td>
+                        <span class="status status-completed"
+                          >Đã thanh toán</span
+                        >
+                      </td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/admin/bookings/2"
+                            class="btn-table btn-view"
+                            title="Xem chi tiết"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a
+                            href="/admin/bookings/2/edit"
+                            class="btn-table btn-edit"
+                            title="Sửa"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <a
+                            href="/admin/bookings/2/vaccination"
+                            class="btn-table btn-primary"
+                            title="Ghi nhận tiêm chủng"
+                          >
+                            <i class="fas fa-syringe"></i>
+                          </a>
+                          <button
+                            class="btn-table btn-delete"
+                            data-id="2"
+                            data-confirm="Bạn có chắc chắn muốn hủy đơn đặt lịch này?"
+                            title="Hủy đơn"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+              <a href="#" class="active">1</a>
+              <a href="#">2</a>
+              <a href="#">3</a>
+              <a href="#">4</a>
+              <a href="#">5</a>
+              <a href="#">&raquo;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/dashboard.js"></script>
+  </body>
+</html>

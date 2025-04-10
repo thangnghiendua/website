@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <div th:replace="fragments/admin-sidebar :: admin-sidebar"></div>
+
+      <!-- Main Content -->
+      <div class="dashboard-main">
+        <!-- Header -->
+        <div class="dashboard-header">
+          <button class="toggle-sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <div class="dashboard-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Tìm kiếm..." />
+          </div>
+
+          <div class="dashboard-actions">
+            <div class="notifications-dropdown">
+              <div class="notifications-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notifications-badge">3</span>
+              </div>
+
+              <div class="notifications-menu">
+                <div class="notifications-header">
+                  <span>Thông báo (3)</span>
+                  <a href="#">Đánh dấu tất cả là đã đọc</a>
+                </div>
+
+                <div class="notifications-list">
+                  <div class="notification-item">
+                    <div class="notification-icon">
+                      <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="notification-content">
+                      <div class="notification-title">Đơn đặt lịch mới</div>
+                      <p>Nguyễn Văn A đã đặt lịch tiêm chủng cho bé An</p>
+                      <div class="notification-time">30 phút trước</div>
+                    </div>
+                  </div>
+
+                  <div class="notification-item">
+                    <div class="notification-icon">
+                      <i class="fas fa-star"></i>
+                    </div>
+                    <div class="notification-content">
+                      <div class="notification-title">Đánh giá mới</div>
+                      <p>Trần Thị B đã đánh giá 5 sao cho dịch vụ</p>
+                      <div class="notification-time">2 giờ trước</div>
+                    </div>
+                  </div>
+
+                  <div class="notification-item">
+                    <div class="notification-icon">
+                      <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="notification-content">
+                      <div class="notification-title">Khách hàng mới</div>
+                      <p>Lê Văn C đã đăng ký tài khoản mới</p>
+                      <div class="notification-time">1 ngày trước</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="notifications-footer">
+                  <a href="#">Xem tất cả thông báo</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-dropdown">
+              <div class="admin-dropdown-toggle">
+                <img src="/images/admin-avatar.jpg" alt="Admin" />
+                <span th:text="${session.admin?.fullName}">Admin</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+
+              <div class="admin-dropdown-menu">
+                <a href="/admin/profile"> <i class="fas fa-user"></i> Hồ sơ </a>
+                <a href="/admin/settings">
+                  <i class="fas fa-cog"></i> Cài đặt
+                </a>
+                <a href="/logout">
+                  <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="dashboard-content">
+          <h1>Tổng quan</h1>
+
+          <!-- Stats -->
+          <div class="dashboard-stats">
+            <div class="stat-card">
+              <div class="stat-icon blue">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" th:text="${totalBookings ?: '58'}">
+                  58
+                </div>
+                <div class="stat-label">Đơn đặt lịch</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon green">
+                <i class="fas fa-syringe"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" th:text="${totalVaccinations ?: '42'}">
+                  42
+                </div>
+                <div class="stat-label">Tiêm chủng hoàn thành</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon orange">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" th:text="${totalUsers ?: '127'}">
+                  127
+                </div>
+                <div class="stat-label">Khách hàng</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon red">
+                <i class="fas fa-coins"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" th:text="${revenue ?: '64.5M'}">
+                  64.5M
+                </div>
+                <div class="stat-label">Doanh thu (VNĐ)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <div class="chart-title">Doanh thu theo tháng</div>
+              <div class="chart-actions">
+                <button class="btn btn-outline">Năm 2023</button>
+                <button class="btn btn-outline">Xuất báo cáo</button>
+              </div>
+            </div>
+            <div class="chart-content">
+              <canvas id="revenueChart"></canvas>
+            </div>
+          </div>
+
+          <div class="dashboard-tables">
+            <div class="table-container">
+              <div class="table-header">
+                <div class="table-title">Đơn đặt lịch gần đây</div>
+                <div class="table-actions">
+                  <a href="/admin/bookings"
+                    ><i class="fas fa-external-link-alt"></i
+                  ></a>
+                </div>
+              </div>
+              <div class="table-content">
+                <table class="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Khách hàng</th>
+                      <th>Trẻ</th>
+                      <th>Dịch vụ</th>
+                      <th>Ngày giờ</th>
+                      <th>Trạng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:each="booking : ${recentBookings}">
+                      <td th:text="${booking.id}">BK-001</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            th:src="${booking.user.avatarUrl}"
+                            src="/images/avatar1.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div>
+                            <div
+                              class="user-name"
+                              th:text="${booking.user.name}"
+                            >
+                              Nguyễn Văn A
+                            </div>
+                            <div
+                              class="user-email"
+                              th:text="${booking.user.email}"
+                            >
+                              nguyenvana@gmail.com
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td th:text="${booking.child.name}">Nguyễn An</td>
+                      <td th:text="${booking.service.name}">Tiêm Viêm gan B</td>
+                      <td
+                        th:text="${#dates.format(booking.datetime, 'dd/MM/yyyy HH:mm')}"
+                      >
+                        30/06/2023 09:00
+                      </td>
+                      <td>
+                        <span
+                          th:class="'status status-' + ${booking.status}"
+                          th:text="${booking.statusText}"
+                          class="status status-pending"
+                          >Chờ xác nhận</span
+                        >
+                      </td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            th:href="@{/admin/bookings/{id}(id=${booking.id})}"
+                            href="/admin/bookings/1"
+                            class="btn-table btn-view"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a
+                            th:href="@{/admin/bookings/{id}/edit(id=${booking.id})}"
+                            href="/admin/bookings/1/edit"
+                            class="btn-table btn-edit"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <!-- Fallback nếu không có dữ liệu -->
+                    <tr
+                      th:if="${recentBookings == null || recentBookings.empty}"
+                    >
+                      <td>BK-001</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            src="/images/avatar1.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div>
+                            <div class="user-name">Nguyễn Văn A</div>
+                            <div class="user-email">nguyenvana@gmail.com</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>Nguyễn An</td>
+                      <td>Tiêm Viêm gan B</td>
+                      <td>30/06/2023 09:00</td>
+                      <td>
+                        <span class="status status-pending">Chờ xác nhận</span>
+                      </td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/admin/bookings/1"
+                            class="btn-table btn-view"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a
+                            href="/admin/bookings/1/edit"
+                            class="btn-table btn-edit"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr
+                      th:if="${recentBookings == null || recentBookings.empty}"
+                    >
+                      <td>BK-002</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            src="/images/avatar2.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div>
+                            <div class="user-name">Trần Thị B</div>
+                            <div class="user-email">tranthib@gmail.com</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>Trần Bình</td>
+                      <td>Gói tiêm chủng cơ bản</td>
+                      <td>01/07/2023 14:30</td>
+                      <td>
+                        <span class="status status-confirmed">Đã xác nhận</span>
+                      </td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/admin/bookings/2"
+                            class="btn-table btn-view"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a
+                            href="/admin/bookings/2/edit"
+                            class="btn-table btn-edit"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <div class="table-header">
+                <div class="table-title">Khách hàng mới</div>
+                <div class="table-actions">
+                  <a href="/admin/customers"
+                    ><i class="fas fa-external-link-alt"></i
+                  ></a>
+                </div>
+              </div>
+              <div class="table-content">
+                <table class="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Họ tên</th>
+                      <th>Email</th>
+                      <th>Số điện thoại</th>
+                      <th>Ngày đăng ký</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:each="user : ${recentUsers}">
+                      <td th:text="${user.id}">U-001</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            th:src="${user.avatarUrl}"
+                            src="/images/avatar3.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div class="user-name" th:text="${user.fullName}">
+                            Lê Văn C
+                          </div>
+                        </div>
+                      </td>
+                      <td th:text="${user.email}">levanc@gmail.com</td>
+                      <td th:text="${user.phone}">0912345678</td>
+                      <td
+                        th:text="${#dates.format(user.registrationDate, 'dd/MM/yyyy')}"
+                      >
+                        28/06/2023
+                      </td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            th:href="@{/admin/customers/{id}(id=${user.id})}"
+                            href="/admin/customers/1"
+                            class="btn-table btn-view"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <!-- Fallback nếu không có dữ liệu -->
+                    <tr th:if="${recentUsers == null || recentUsers.empty}">
+                      <td>U-001</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            src="/images/avatar3.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div class="user-name">Lê Văn C</div>
+                        </div>
+                      </td>
+                      <td>levanc@gmail.com</td>
+                      <td>0912345678</td>
+                      <td>28/06/2023</td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/admin/customers/1"
+                            class="btn-table btn-view"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr th:if="${recentUsers == null || recentUsers.empty}">
+                      <td>U-002</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            src="/images/avatar4.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div class="user-name">Phạm Thị D</div>
+                        </div>
+                      </td>
+                      <td>phamthid@gmail.com</td>
+                      <td>0987654321</td>
+                      <td>27/06/2023</td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/admin/customers/2"
+                            class="btn-table btn-view"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-charts">
+            <div class="chart-container">
+              <div class="chart-header">
+                <div class="chart-title">Dịch vụ tiêm chủng</div>
+              </div>
+              <div class="chart-content">
+                <canvas id="servicesChart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-container">
+              <div class="chart-header">
+                <div class="chart-title">Phân bố độ tuổi</div>
+              </div>
+              <div class="chart-content">
+                <canvas id="ageChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/dashboard.js"></script>
+  </body>
+</html>

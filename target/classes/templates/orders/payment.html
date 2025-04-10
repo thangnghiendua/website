@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thanh toán - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block
+      th:replace="fragments/responsive-styles :: responsive-styles"
+    ></th:block>
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="container">
+        <h1>Thanh toán</h1>
+      </div>
+    </div>
+
+    <!-- Payment Section -->
+    <section class="payment-section">
+      <div class="container">
+        <div class="payment-container">
+          <!-- Order Summary -->
+          <div class="payment-summary">
+            <h3>Thông tin đơn hàng</h3>
+
+            <div class="order-info">
+              <p>
+                <span>Mã đơn:</span>
+                <strong th:text="${order?.id ?: 'BK-123456'}">BK-123456</strong>
+              </p>
+              <p>
+                <span>Dịch vụ:</span>
+                <span
+                  th:text="${order?.service?.name ?: 'Tiêm vaccine Viêm gan B'}"
+                  >Tiêm vaccine Viêm gan B</span
+                >
+              </p>
+              <p>
+                <span>Trẻ:</span>
+                <span th:text="${order?.child?.name ?: 'Nguyễn Văn An'}"
+                  >Nguyễn Văn An</span
+                >
+              </p>
+              <p>
+                <span>Ngày giờ:</span>
+                <span
+                  th:text="${order?.datetime != null ? #dates.format(order.datetime, 'dd/MM/yyyy HH:mm') : '30/06/2023 09:00'}"
+                  >30/06/2023 09:00</span
+                >
+              </p>
+            </div>
+
+            <div class="price-summary">
+              <div class="price-item">
+                <span>Giá dịch vụ:</span>
+                <span
+                  th:text="${order?.service?.price != null ? #numbers.formatDecimal(order.service.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : '300.000 VNĐ'}"
+                  >300.000 VNĐ</span
+                >
+              </div>
+
+              <div
+                class="price-item discount"
+                th:if="${order?.discount != null && order.discount > 0}"
+              >
+                <span>Giảm giá:</span>
+                <span
+                  th:text="${#numbers.formatDecimal(order.discount, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"
+                  >-50.000 VNĐ</span
+                >
+              </div>
+
+              <div class="price-item total">
+                <span>Tổng thanh toán:</span>
+                <span
+                  th:text="${order?.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : '300.000 VNĐ'}"
+                  >300.000 VNĐ</span
+                >
+              </div>
+            </div>
+
+            <div class="payment-policy">
+              <h4>Chính sách thanh toán</h4>
+              <ul>
+                <li>
+                  Thanh toán trực tiếp tại cơ sở: Thanh toán khi đến tiêm chủng.
+                </li>
+                <li>
+                  Chuyển khoản ngân hàng: Thanh toán trước và gửi xác nhận.
+                </li>
+                <li>Ví điện tử: Thanh toán qua Momo, ZaloPay, VNPay.</li>
+                <li>
+                  Hoàn tiền: Hoàn 100% nếu hủy trước 24 giờ, hoàn 50% nếu hủy
+                  trong vòng 12-24 giờ.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Payment Form -->
+          <div class="payment-form">
+            <h3>Phương thức thanh toán</h3>
+
+            <form
+              th:action="@{/orders/{id}/payment(id=${order?.id})}"
+              action="/orders/123/payment"
+              method="post"
+            >
+              <div class="payment-methods">
+                <div class="payment-method">
+                  <input
+                    type="radio"
+                    id="paymentCash"
+                    name="paymentMethod"
+                    value="cash"
+                    checked
+                  />
+                  <label for="paymentCash" class="payment-method-card">
+                    <div class="payment-method-icon">
+                      <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="payment-method-info">
+                      <h4>Thanh toán tại cơ sở</h4>
+                      <p>Thanh toán bằng tiền mặt khi đến tiêm chủng</p>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="payment-method">
+                  <input
+                    type="radio"
+                    id="paymentBanking"
+                    name="paymentMethod"
+                    value="banking"
+                  />
+                  <label for="paymentBanking" class="payment-method-card">
+                    <div class="payment-method-icon">
+                      <i class="fas fa-university"></i>
+                    </div>
+                    <div class="payment-method-info">
+                      <h4>Chuyển khoản ngân hàng</h4>
+                      <p>Chuyển khoản qua tài khoản ngân hàng</p>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="payment-method">
+                  <input
+                    type="radio"
+                    id="paymentMomo"
+                    name="paymentMethod"
+                    value="momo"
+                  />
+                  <label for="paymentMomo" class="payment-method-card">
+                    <div class="payment-method-icon">
+                      <img
+                        src="/images/momo-icon.png"
+                        alt="Momo"
+                        onerror="this.src='/images/wallet-icon.png'"
+                      />
+                    </div>
+                    <div class="payment-method-info">
+                      <h4>Ví Momo</h4>
+                      <p>Thanh toán qua ví điện tử Momo</p>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="payment-method">
+                  <input
+                    type="radio"
+                    id="paymentZaloPay"
+                    name="paymentMethod"
+                    value="zalopay"
+                  />
+                  <label for="paymentZaloPay" class="payment-method-card">
+                    <div class="payment-method-icon">
+                      <img
+                        src="/images/zalopay-icon.png"
+                        alt="ZaloPay"
+                        onerror="this.src='/images/wallet-icon.png'"
+                      />
+                    </div>
+                    <div class="payment-method-info">
+                      <h4>ZaloPay</h4>
+                      <p>Thanh toán qua ví điện tử ZaloPay</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Banking Details (hidden by default) -->
+              <div
+                class="payment-details"
+                id="bankingDetails"
+                style="display: none"
+              >
+                <h4>Thông tin chuyển khoản</h4>
+                <div class="banking-info">
+                  <p>Ngân hàng: <strong>Vietcombank</strong></p>
+                  <p>Số tài khoản: <strong>1234567890</strong></p>
+                  <p>Chủ tài khoản: <strong>CÔNG TY TIÊM CHỦNG XYZ</strong></p>
+                  <p>
+                    Nội dung chuyển khoản:
+                    <strong th:text="${'BK-' + (order?.id ?: '123456')}"
+                      >BK-123456</strong
+                    >
+                  </p>
+                </div>
+
+                <div class="form-group">
+                  <label for="transactionId">Mã giao dịch:</label>
+                  <input
+                    type="text"
+                    id="transactionId"
+                    name="transactionId"
+                    class="form-control"
+                  />
+                  <div class="form-help">
+                    Nhập mã giao dịch sau khi bạn đã chuyển khoản thành công
+                  </div>
+                </div>
+              </div>
+
+              <!-- E-wallet Details (hidden by default) -->
+              <div
+                class="payment-details"
+                id="ewalletDetails"
+                style="display: none"
+              >
+                <h4>Quét mã QR để thanh toán</h4>
+                <div class="qr-code">
+                  <img
+                    src="/images/payment-qr.png"
+                    alt="QR Code"
+                    onerror="this.src='https://via.placeholder.com/200x200?text=QR+Code'"
+                  />
+                </div>
+                <div class="form-help">
+                  Sử dụng ứng dụng để quét mã QR và hoàn tất thanh toán
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="checkbox-item">
+                  <input
+                    type="checkbox"
+                    id="termsAccept"
+                    name="termsAccept"
+                    required
+                  />
+                  <label for="termsAccept"
+                    >Tôi đã đọc và đồng ý với
+                    <a href="/terms" target="_blank"
+                      >điều khoản thanh toán</a
+                    ></label
+                  >
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <a
+                  th:href="@{/orders/{id}(id=${order?.id})}"
+                  href="/orders/123"
+                  class="btn-outline"
+                  >Quay lại</a
+                >
+                <button type="submit" class="btn-primary">
+                  Xác nhận thanh toán
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const paymentCash = document.getElementById("paymentCash");
+        const paymentBanking = document.getElementById("paymentBanking");
+        const paymentMomo = document.getElementById("paymentMomo");
+        const paymentZaloPay = document.getElementById("paymentZaloPay");
+
+        const bankingDetails = document.getElementById("bankingDetails");
+        const ewalletDetails = document.getElementById("ewalletDetails");
+
+        function updatePaymentDetails() {
+          if (paymentBanking.checked) {
+            bankingDetails.style.display = "block";
+            ewalletDetails.style.display = "none";
+          } else if (paymentMomo.checked || paymentZaloPay.checked) {
+            bankingDetails.style.display = "none";
+            ewalletDetails.style.display = "block";
+          } else {
+            bankingDetails.style.display = "none";
+            ewalletDetails.style.display = "none";
+          }
+        }
+
+        paymentCash.addEventListener("change", updatePaymentDetails);
+        paymentBanking.addEventListener("change", updatePaymentDetails);
+        paymentMomo.addEventListener("change", updatePaymentDetails);
+        paymentZaloPay.addEventListener("change", updatePaymentDetails);
+
+        // Initial update
+        updatePaymentDetails();
+      });
+    </script>
+  </body>
+</html>

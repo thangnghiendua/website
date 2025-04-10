@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý khách hàng - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block
+      th:replace="fragments/responsive-styles :: responsive-styles"
+    ></th:block>
+    <th:block
+      th:replace="fragments/dashboard-styles :: dashboard-styles"
+    ></th:block>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <div th:replace="fragments/admin-sidebar :: admin-sidebar"></div>
+
+      <!-- Main Content -->
+      <div class="dashboard-main">
+        <!-- Header -->
+        <div class="dashboard-header">
+          <button class="toggle-sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <div class="dashboard-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Tìm kiếm khách hàng..." />
+          </div>
+
+          <div class="dashboard-actions">
+            <div class="admin-dropdown">
+              <div class="admin-dropdown-toggle">
+                <img src="/images/admin-avatar.jpg" alt="Admin" />
+                <span th:text="${session.admin?.fullName}">Admin</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+
+              <div class="admin-dropdown-menu">
+                <a href="/admin/profile"> <i class="fas fa-user"></i> Hồ sơ </a>
+                <a href="/admin/settings">
+                  <i class="fas fa-cog"></i> Cài đặt
+                </a>
+                <a href="/logout">
+                  <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="dashboard-content">
+          <h1>Quản lý khách hàng</h1>
+
+          <div class="customer-management">
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+              <div class="filter-group">
+                <label for="statusFilter">Trạng thái:</label>
+                <select id="statusFilter" class="form-control">
+                  <option value="">Tất cả</option>
+                  <option value="active">Đang hoạt động</option>
+                  <option value="inactive">Không hoạt động</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="dateFilter">Ngày đăng ký:</label>
+                <input type="date" id="dateFilter" class="form-control" />
+              </div>
+
+              <button class="btn-primary">
+                <i class="fas fa-filter"></i> Lọc
+              </button>
+
+              <button class="btn-outline">
+                <i class="fas fa-sync-alt"></i> Đặt lại
+              </button>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="bulk-actions">
+              <form class="bulk-action-form">
+                <select class="form-control bulk-action-select">
+                  <option value="">Hành động hàng loạt</option>
+                  <option value="activate">Kích hoạt</option>
+                  <option value="deactivate">Vô hiệu hóa</option>
+                  <option value="export">Xuất dữ liệu</option>
+                </select>
+                <button
+                  type="button"
+                  class="btn-outline bulk-action-btn"
+                  disabled
+                >
+                  Thực hiện
+                </button>
+              </form>
+
+              <button class="btn-outline">
+                <i class="fas fa-file-export"></i> Xuất Excel
+              </button>
+            </div>
+
+            <!-- Customers Table -->
+            <div class="table-container">
+              <div class="table-responsive">
+                <table class="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        <input type="checkbox" class="select-all-checkbox" />
+                      </th>
+                      <th>ID</th>
+                      <th>Họ tên</th>
+                      <th>Email</th>
+                      <th>Số điện thoại</th>
+                      <th>Ngày đăng ký</th>
+                      <th>Số trẻ</th>
+                      <th>Đơn đặt lịch</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:each="user : ${users}">
+                      <td>
+                        <input
+                          type="checkbox"
+                          class="item-checkbox"
+                          th:value="${user.id}"
+                        />
+                      </td>
+                      <td th:text="${user.id}">1</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            th:src="${user.avatarUrl}"
+                            src="/images/avatar1.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div>
+                            <div class="user-name" th:text="${user.fullName}">
+                              Nguyễn Văn A
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td th:text="${user.email}">nguyenvana@gmail.com</td>
+                      <td th:text="${user.phone}">0123456789</td>
+                      <td
+                        th:text="${#dates.format(user.registrationDate, 'dd/MM/yyyy')}"
+                      >
+                        01/01/2023
+                      </td>
+                      <td
+                        th:text="${user.children != null ? user.children.size() : 0}"
+                      >
+                        2
+                      </td>
+                      <td th:text="${user.bookingCount ?: 5}">5</td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            th:href="@{/admin/customers/{id}(id=${user.id})}"
+                            href="/admin/customers/1"
+                            class="btn-table btn-view"
+                            title="Xem chi tiết"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a
+                            th:href="@{/admin/customers/{id}/edit(id=${user.id})}"
+                            href="/admin/customers/1/edit"
+                            class="btn-table btn-edit"
+                            title="Sửa"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <button
+                            class="btn-table btn-delete"
+                            th:data-id="${user.id}"
+                            data-confirm="Bạn có chắc chắn muốn xóa khách hàng này?"
+                            title="Xóa"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <!-- Fallback nếu không có dữ liệu từ controller -->
+                    <tr th:if="${users == null || users.empty}">
+                      <td>
+                        <input
+                          type="checkbox"
+                          class="item-checkbox"
+                          value="1"
+                        />
+                      </td>
+                      <td>1</td>
+                      <td>
+                        <div class="user-info">
+                          <img
+                            src="/images/avatar1.jpg"
+                            alt="User"
+                            class="user-avatar"
+                          />
+                          <div>
+                            <div class="user-name">Nguyễn Văn A</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>nguyenvana@gmail.com</td>
+                      <td>0123456789</td>
+                      <td>01/01/2023</td>
+                      <td>2</td>
+                      <td>5</td>
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/admin/customers/1"
+                            class="btn-table btn-view"
+                            title="Xem chi tiết"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a
+                            href="/admin/customers/1/edit"
+                            class="btn-table btn-edit"
+                            title="Sửa"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <button
+                            class="btn-table btn-delete"
+                            data-id="1"
+                            data-confirm="Bạn có chắc chắn muốn xóa khách hàng này?"
+                            title="Xóa"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+              <a href="#" class="active">1</a>
+              <a href="#">2</a>
+              <a href="#">3</a>
+              <a href="#">&raquo;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/dashboard.js"></script>
+  </body>
+</html>

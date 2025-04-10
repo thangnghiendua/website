@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi tiết hồ sơ trẻ em - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <th:block th:replace="fragments/styles :: styles"></th:block>
+    <th:block
+      th:replace="fragments/responsive-styles :: responsive-styles"
+    ></th:block>
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="container">
+        <h1>Chi tiết hồ sơ trẻ em</h1>
+      </div>
+    </div>
+
+    <!-- Child Detail Section -->
+    <section class="child-detail-section">
+      <div class="container">
+        <div class="children-container">
+          <!-- Sidebar -->
+          <div th:replace="fragments/sidebar :: sidebar"></div>
+
+          <!-- Main Content -->
+          <div class="main-content">
+            <div th:if="${param.success}" class="alert alert-success">
+              Thao tác thành công!
+            </div>
+
+            <!-- Child Profile -->
+            <div class="child-profile">
+              <div class="profile-header">
+                <div class="profile-avatar">
+                  <img
+                    th:src="${child != null && child.avatarUrl != null ? child.avatarUrl : '/images/child-placeholder.png'}"
+                    alt="Avatar"
+                  />
+                </div>
+                <div class="profile-actions">
+                  <a
+                    th:href="@{/children/{id}/edit(id=${child?.id})}"
+                    href="/children/1/edit"
+                    class="btn-outline"
+                  >
+                    <i class="fas fa-edit"></i> Chỉnh sửa
+                  </a>
+                  <a
+                    th:href="@{/schedule/booking?childId={id}(id=${child?.id})}"
+                    href="/schedule/booking?childId=1"
+                    class="btn-primary"
+                  >
+                    <i class="fas fa-calendar-plus"></i> Đặt lịch tiêm
+                  </a>
+                </div>
+              </div>
+
+              <div class="profile-info">
+                <h2 th:text="${child?.name}">Nguyễn Văn An</h2>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <div class="info-label">Ngày sinh:</div>
+                    <div
+                      class="info-value"
+                      th:text="${child?.birthDate != null ? #dates.format(child.birthDate, 'dd/MM/yyyy') : '01/01/2020'}"
+                    >
+                      01/01/2020
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">Giới tính:</div>
+                    <div
+                      class="info-value"
+                      th:text="${child?.gender == 'M' ? 'Nam' : 'Nữ'}"
+                    >
+                      Nam
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">Tuổi:</div>
+                    <div
+                      class="info-value"
+                      th:text="${child?.ageDescription ?: '3 tuổi 2 tháng'}"
+                    >
+                      3 tuổi 2 tháng
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">Cân nặng:</div>
+                    <div
+                      class="info-value"
+                      th:text="${child?.weight != null ? child.weight + ' kg' : '15 kg'}"
+                    >
+                      15 kg
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">Chiều cao:</div>
+                    <div
+                      class="info-value"
+                      th:text="${child?.height != null ? child.height + ' cm' : '95 cm'}"
+                    >
+                      95 cm
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">Quan hệ với người giám hộ:</div>
+                    <div
+                      class="info-value"
+                      th:text="${child?.relationship == 'parent' ? 'Cha/Mẹ' : (child?.relationship == 'grandparent' ? 'Ông/Bà' : 'Khác')}"
+                    >
+                      Cha/Mẹ
+                    </div>
+                  </div>
+                </div>
+
+                <div class="medical-info">
+                  <h3>Thông tin y tế</h3>
+                  <div class="info-item full-width">
+                    <div class="info-label">Dị ứng:</div>
+                    <div
+                      class="info-value"
+                      th:text="${child?.allergies ?: 'Không có'}"
+                    >
+                      Không có
+                    </div>
+                  </div>
+                  <div class="info-item full-width">
+                    <div class="info-label">Tiền sử bệnh:</div>
+                    <div
+                      class="info-value"
+                      th:text="${child?.medicalHistory ?: 'Không có'}"
+                    >
+                      Không có
+                    </div>
+                  </div>
+                  <div class="info-item full-width">
+                    <div class="info-label">Ghi chú:</div>
+                    <div
+                      class="info-value"
+                      th:text="${child?.note ?: 'Không có'}"
+                    >
+                      Không có
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Vaccination History -->
+              <div class="vaccination-history">
+                <div class="section-header">
+                  <h3>Lịch sử tiêm chủng</h3>
+                  <div class="completed-count">
+                    <span th:text="${child?.completedVaccinations ?: '5'}"
+                      >5</span
+                    >
+                    mũi tiêm đã hoàn thành
+                  </div>
+                </div>
+
+                <div class="vaccination-timeline">
+                  <div
+                    class="timeline-item"
+                    th:each="vaccination, idx : ${vaccinationHistory}"
+                  >
+                    <div class="timeline-point"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-header">
+                        <h4 th:text="${vaccination.vaccineName}">
+                          Vaccine Viêm gan B (Liều 1)
+                        </h4>
+                        <span
+                          class="timeline-date"
+                          th:text="${#dates.format(vaccination.date, 'dd/MM/yyyy')}"
+                          >01/02/2020</span
+                        >
+                      </div>
+                      <div class="timeline-body">
+                        <p th:text="${vaccination.note}">
+                          Tiêm chủng bình thường, không có phản ứng phụ.
+                        </p>
+                        <div class="vaccination-details">
+                          <span
+                            >Bác sĩ:
+                            <strong th:text="${vaccination.doctor}"
+                              >BS. Nguyễn Thị Hương</strong
+                            ></span
+                          >
+                          <span
+                            >Cơ sở: <strong>Trung tâm Tiêm chủng</strong></span
+                          >
+                          <span
+                            >Lô vaccine:
+                            <strong th:text="${vaccination.batchNumber}"
+                              >VGB-2020-001</strong
+                            ></span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fallback nếu không có dữ liệu -->
+                  <div
+                    class="timeline-item"
+                    th:if="${vaccinationHistory == null || vaccinationHistory.empty}"
+                  >
+                    <div class="timeline-point"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-header">
+                        <h4>Vaccine Viêm gan B (Liều 1)</h4>
+                        <span class="timeline-date">01/02/2020</span>
+                      </div>
+                      <div class="timeline-body">
+                        <p>Tiêm chủng bình thường, không có phản ứng phụ.</p>
+                        <div class="vaccination-details">
+                          <span
+                            >Bác sĩ: <strong>BS. Nguyễn Thị Hương</strong></span
+                          >
+                          <span
+                            >Cơ sở: <strong>Trung tâm Tiêm chủng</strong></span
+                          >
+                          <span>Lô vaccine: <strong>VGB-2020-001</strong></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="timeline-item"
+                    th:if="${vaccinationHistory == null || vaccinationHistory.empty}"
+                  >
+                    <div class="timeline-point"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-header">
+                        <h4>Vaccine DPT (Liều 1)</h4>
+                        <span class="timeline-date">01/03/2020</span>
+                      </div>
+                      <div class="timeline-body">
+                        <p>Tiêm chủng bình thường, sốt nhẹ sau tiêm 1 ngày.</p>
+                        <div class="vaccination-details">
+                          <span
+                            >Bác sĩ: <strong>BS. Trần Văn Minh</strong></span
+                          >
+                          <span
+                            >Cơ sở: <strong>Trung tâm Tiêm chủng</strong></span
+                          >
+                          <span>Lô vaccine: <strong>DPT-2020-005</strong></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upcoming Vaccinations -->
+              <div class="upcoming-vaccinations">
+                <h3>Lịch tiêm chủng đề xuất</h3>
+
+                <div class="vaccine-recommendations">
+                  <div
+                    class="recommendation-item"
+                    th:each="recommendation : ${upcomingVaccinations}"
+                  >
+                    <div class="recommendation-header">
+                      <h4 th:text="${recommendation.vaccineName}">
+                        Vaccine Viêm gan B (Liều 3)
+                      </h4>
+                      <span
+                        class="recommended-age"
+                        th:text="${recommendation.recommendedAge}"
+                        >6 tháng tuổi</span
+                      >
+                    </div>
+                    <div class="recommendation-body">
+                      <p th:text="${recommendation.description}">
+                        Mũi tiêm cuối cùng trong loạt vaccine Viêm gan B.
+                      </p>
+                      <div class="recommendation-action">
+                        <a
+                          th:href="@{/schedule/booking?childId={childId}&vaccineId={vaccineId}(childId=${child?.id},vaccineId=${recommendation.vaccineId})}"
+                          class="btn-outline"
+                          >Đặt lịch tiêm</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fallback nếu không có dữ liệu -->
+                  <div
+                    class="recommendation-item"
+                    th:if="${upcomingVaccinations == null || upcomingVaccinations.empty}"
+                  >
+                    <div class="recommendation-header">
+                      <h4>Vaccine Viêm gan B (Liều 3)</h4>
+                      <span class="recommended-age">6 tháng tuổi</span>
+                    </div>
+                    <div class="recommendation-body">
+                      <p>Mũi tiêm cuối cùng trong loạt vaccine Viêm gan B.</p>
+                      <div class="recommendation-action">
+                        <a
+                          href="/schedule/booking?childId=1&vaccineId=3"
+                          class="btn-outline"
+                          >Đặt lịch tiêm</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="recommendation-item"
+                    th:if="${upcomingVaccinations == null || upcomingVaccinations.empty}"
+                  >
+                    <div class="recommendation-header">
+                      <h4>Vaccine MMR (Sởi - Quai bị - Rubella)</h4>
+                      <span class="recommended-age">12 tháng tuổi</span>
+                    </div>
+                    <div class="recommendation-body">
+                      <p>Vaccine phòng ngừa Sởi, Quai bị và Rubella.</p>
+                      <div class="recommendation-action">
+                        <a
+                          href="/schedule/booking?childId=1&vaccineId=5"
+                          class="btn-outline"
+                          >Đặt lịch tiêm</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+  </body>
+</html>

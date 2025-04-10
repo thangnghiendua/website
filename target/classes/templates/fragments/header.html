@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <header th:fragment="header">
+      <div class="header-container">
+        <div class="logo">
+          <a href="/">
+            <img src="/images/logo.png" alt="Trung tâm Tiêm chủng" />
+          </a>
+        </div>
+
+        <div class="mobile-menu-toggle">
+          <i class="fas fa-bars"></i>
+        </div>
+
+        <nav class="main-nav">
+          <ul>
+            <li>
+              <a
+                href="/"
+                th:classappend="${#httpServletRequest.getRequestURI() == '/' ? 'active' : ''}"
+                >Trang chủ</a
+              >
+            </li>
+            <li>
+              <a
+                href="/services"
+                th:classappend="${#httpServletRequest.getRequestURI().startsWith('/services') ? 'active' : ''}"
+                >Dịch vụ</a
+              >
+            </li>
+            <li>
+              <a
+                href="/prices"
+                th:classappend="${#httpServletRequest.getRequestURI() == '/prices' ? 'active' : ''}"
+                >Bảng giá</a
+              >
+            </li>
+            <li>
+              <a
+                href="/guide"
+                th:classappend="${#httpServletRequest.getRequestURI() == '/guide' ? 'active' : ''}"
+                >Cẩm nang</a
+              >
+            </li>
+            <li>
+              <a href="/schedule/booking" class="btn-booking">Đặt lịch ngay</a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="user-actions">
+          <div th:if="${session.user != null}">
+            <div class="dropdown">
+              <button class="dropdown-toggle">
+                <span th:text="${session.user.fullName}">Tên người dùng</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a href="/profile">Thông tin cá nhân</a>
+                <a href="/children/list">Hồ sơ trẻ em</a>
+                <a href="/schedule/calendar">Lịch tiêm chủng</a>
+                <a href="/orders/list">Đơn đặt lịch</a>
+                <a href="/notifications">Thông báo</a>
+                <a href="/logout">Đăng xuất</a>
+              </div>
+            </div>
+          </div>
+          <div th:unless="${session.user != null}">
+            <a href="/login" class="btn-login">Đăng nhập</a>
+            <a href="/register" class="btn-register">Đăng ký</a>
+          </div>
+          <div class="search">
+            <i class="fas fa-search"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+  </body>
+</html>

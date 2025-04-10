@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đặt lịch tiêm chủng - Trung tâm Tiêm chủng</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Booking Section -->
+    <section class="booking-section">
+      <div class="container">
+        <h1>Đặt lịch tiêm chủng</h1>
+
+        <div class="booking-progress">
+          <div class="step active" id="step-1">
+            <div class="step-number">1</div>
+            <div class="step-text">Chọn trẻ</div>
+          </div>
+          <div class="step" id="step-2">
+            <div class="step-number">2</div>
+            <div class="step-text">Chọn dịch vụ</div>
+          </div>
+          <div class="step" id="step-3">
+            <div class="step-number">3</div>
+            <div class="step-text">Chọn thời gian</div>
+          </div>
+          <div class="step" id="step-4">
+            <div class="step-number">4</div>
+            <div class="step-text">Xác nhận</div>
+          </div>
+        </div>
+
+        <div class="booking-container">
+          <div class="booking-form">
+            <form
+              id="bookingForm"
+              th:action="@{/schedule/booking}"
+              method="post"
+              th:object="${bookingForm}"
+            >
+              <!-- Step 1: Chọn trẻ -->
+              <div class="booking-step" id="step1-content">
+                <h2>Chọn trẻ em</h2>
+
+                <div
+                  class="children-list"
+                  th:if="${children != null && !children.empty}"
+                >
+                  <div class="child-item" th:each="child : ${children}">
+                    <input
+                      type="radio"
+                      name="childId"
+                      th:id="'child-' + ${child.id}"
+                      th:value="${child.id}"
+                      th:checked="${param.childId != null && param.childId[0] == child.id.toString()}"
+                      required
+                    />
+                    <label th:for="'child-' + ${child.id}" class="child-card">
+                      <div class="child-avatar">
+                        <img
+                          th:src="${child.avatarUrl != null ? child.avatarUrl : '/images/child-placeholder.png'}"
+                          alt="Avatar"
+                        />
+                      </div>
+                      <div class="child-info">
+                        <h3 th:text="${child.name}">Tên trẻ</h3>
+                        <p>
+                          <span
+                            th:text="'Ngày sinh: ' + ${#dates.format(child.birthDate, 'dd/MM/yyyy')}"
+                            >Ngày sinh: 01/01/2020</span
+                          ><br />
+                          <span th:text="'Tuổi: ' + ${child.ageDescription}"
+                            >Tuổi: 24 tháng tuổi</span
+                          >
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Fallback nếu chưa có hồ sơ trẻ em -->
+                <div
+                  class="no-children"
+                  th:if="${children == null || children.empty}"
+                >
+                  <p>
+                    Bạn chưa có hồ sơ trẻ em nào. Vui lòng thêm hồ sơ trẻ em
+                    trước khi đặt lịch.
+                  </p>
+                  <a href="/children/add" class="btn-primary"
+                    >Thêm hồ sơ trẻ em</a
+                  >
+                </div>
+
+                <div
+                  class="form-actions"
+                  th:if="${children != null && !children.empty}"
+                >
+                  <button type="button" class="btn-next" id="step1-next">
+                    Tiếp theo
+                  </button>
+                </div>
+              </div>
+
+              <!-- Step 2: Chọn dịch vụ -->
+              <div
+                class="booking-step"
+                id="step2-content"
+                style="display: none"
+              >
+                <h2>Chọn dịch vụ tiêm chủng</h2>
+
+                <div class="service-tabs">
+                  <button
+                    type="button"
+                    class="tab-btn active"
+                    data-tab="tab-single"
+                  >
+                    Tiêm lẻ
+                  </button>
+                  <button type="button" class="tab-btn" data-tab="tab-package">
+                    Gói tiêm chủng
+                  </button>
+                  <button type="button" class="tab-btn" data-tab="tab-custom">
+                    Cá thể hóa
+                  </button>
+                </div>
+
+                <div class="service-tab-content">
+                  <!-- Tab tiêm lẻ -->
+                  <div class="tab-pane active" id="tab-single">
+                    <div class="service-list">
+                      <div
+                        class="service-item"
+                        th:each="service : ${singleVaccines}"
+                      >
+                        <input
+                          type="radio"
+                          name="serviceId"
+                          th:id="'service-' + ${service.id}"
+                          th:value="${service.id}"
+                          required
+                        />
+                        <label
+                          th:for="'service-' + ${service.id}"
+                          class="service-card"
+                        >
+                          <div class="service-info">
+                            <h3 th:text="${service.name}">Tên vaccine</h3>
+                            <p th:text="${service.description}">
+                              Mô tả vaccine
+                            </p>
+                            <div class="service-price">
+                              <span
+                                th:text="${#numbers.formatDecimal(service.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
+                                >300.000 VNĐ</span
+                              >
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+
+                      <!-- Fallback nếu không có dữ liệu -->
+                      <div
+                        class="service-item"
+                        th:if="${singleVaccines == null || singleVaccines.empty}"
+                      >
+                        <input
+                          type="radio"
+                          name="serviceId"
+                          id="service-1"
+                          value="1"
+                          required
+                        />
+                        <label for="service-1" class="service-card">
+                          <div class="service-info">
+                            <h3>Vaccine Viêm gan B</h3>
+                            <p>Phòng ngừa bệnh viêm gan B</p>
+                            <div class="service-price">
+                              <span>300.000 VNĐ</span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+
+                      <div
+                        class="service-item"
+                        th:if="${singleVaccines == null || singleVaccines.empty}"
+                      >
+                        <input
+                          type="radio"
+                          name="serviceId"
+                          id="service-2"
+                          value="2"
+                        />
+                        <label for="service-2" class="service-card">
+                          <div class="service-info">
+                            <h3>Vaccine Bạch hầu - Ho gà - Uốn ván (DPT)</h3>
+                            <p>Phòng ngừa bệnh bạch hầu, ho gà, uốn ván</p>
+                            <div class="service-price">
+                              <span>350.000 VNĐ</span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Tab gói tiêm chủng -->
+                  <div class="tab-pane" id="tab-package">
+                    <div class="service-list">
+                      <div
+                        class="service-item"
+                        th:each="package : ${vaccinePackages}"
+                      >
+                        <input
+                          type="radio"
+                          name="serviceId"
+                          th:id="'package-' + ${package.id}"
+                          th:value="${package.id}"
+                        />
+                        <label
+                          th:for="'package-' + ${package.id}"
+                          class="service-card"
+                        >
+                          <div class="service-info">
+                            <h3 th:text="${package.name}">Tên gói</h3>
+                            <p th:text="${package.description}">Mô tả gói</p>
+                            <ul class="package-items">
+                              <li
+                                th:each="item : ${package.items}"
+                                th:text="${item}"
+                              >
+                                Vaccine 1
+                              </li>
+                            </ul>
+                            <div class="service-price">
+                              <span
+                                th:text="${#numbers.formatDecimal(package.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
+                                >1.200.000 VNĐ</span
+                              >
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+
+                      <!-- Fallback nếu không có dữ liệu -->
+                      <div
+                        class="service-item"
+                        th:if="${vaccinePackages == null || vaccinePackages.empty}"
+                      >
+                        <input
+                          type="radio"
+                          name="serviceId"
+                          id="package-1"
+                          value="101"
+                        />
+                        <label for="package-1" class="service-card">
+                          <div class="service-info">
+                            <h3>Gói tiêm chủng cơ bản</h3>
+                            <p>
+                              Gói vaccine phòng ngừa các bệnh phổ biến cho trẻ
+                            </p>
+                            <ul class="package-items">
+                              <li>Vaccine Viêm gan B</li>
+                              <li>Vaccine Bạch hầu - Ho gà - Uốn ván (DPT)</li>
+                              <li>Vaccine Sởi - Quai bị - Rubella (MMR)</li>
+                            </ul>
+                            <div class="service-price">
+                              <span>1.200.000 VNĐ</span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+
+                      <div
+                        class="service-item"
+                        th:if="${vaccinePackages == null || vaccinePackages.empty}"
+                      >
+                        <input
+                          type="radio"
+                          name="serviceId"
+                          id="package-2"
+                          value="102"
+                        />
+                        <label for="package-2" class="service-card">
+                          <div class="service-info">
+                            <h3>Gói tiêm chủng nâng cao</h3>
+                            <p>
+                              Gói vaccine phòng ngừa toàn diện nhiều bệnh hơn
+                            </p>
+                            <ul class="package-items">
+                              <li>Tất cả vaccine trong gói cơ bản</li>
+                              <li>Vaccine Viêm não Nhật Bản</li>
+                              <li>Vaccine Thủy đậu</li>
+                              <li>Vaccine Viêm phổi</li>
+                            </ul>
+                            <div class="service-price">
+                              <span>2.500.000 VNĐ</span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Tab cá thể hóa -->
+                  <div class="tab-pane" id="tab-custom">
+                    <div class="custom-package">
+                      <div class="custom-package-info">
+                        <h3>Tiêm chủng cá thể hóa</h3>
+                        <p>
+                          Dịch vụ tiêm chủng được thiết kế riêng phù hợp với
+                          tình trạng sức khỏe và nhu cầu của trẻ. Bác sĩ sẽ tư
+                          vấn và đề xuất lịch tiêm chủng phù hợp nhất.
+                        </p>
+
+                        <div class="custom-package-features">
+                          <div class="feature-item">
+                            <div class="feature-icon">
+                              <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="feature-text">
+                              <h4>Tư vấn 1:1 với bác sĩ chuyên khoa</h4>
+                            </div>
+                          </div>
+
+                          <div class="feature-item">
+                            <div class="feature-icon">
+                              <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="feature-text">
+                              <h4>Lịch tiêm chủng linh hoạt</h4>
+                            </div>
+                          </div>
+
+                          <div class="feature-item">
+                            <div class="feature-icon">
+                              <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="feature-text">
+                              <h4>Theo dõi sát sao sau tiêm</h4>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="customNotes"
+                            >Ghi chú về nhu cầu tiêm chủng của bạn:</label
+                          >
+                          <textarea
+                            id="customNotes"
+                            name="customNotes"
+                            class="form-control"
+                            rows="4"
+                          ></textarea>
+                        </div>
+
+                        <div class="custom-service">
+                          <input
+                            type="radio"
+                            name="serviceId"
+                            id="service-custom"
+                            value="custom"
+                          />
+                          <label for="service-custom" class="service-card">
+                            <div class="service-info">
+                              <h3>Dịch vụ tư vấn tiêm chủng cá nhân hóa</h3>
+                              <p>
+                                Bao gồm: Buổi tư vấn với bác sĩ chuyên khoa,
+                                đánh giá tình trạng sức khỏe và đề xuất lịch
+                                tiêm phù hợp
+                              </p>
+                              <div class="service-price">
+                                <span>200.000 VNĐ</span>
+                              </div>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-back" id="step2-back">
+                    Quay lại
+                  </button>
+                  <button type="button" class="btn-next" id="step2-next">
+                    Tiếp theo
+                  </button>
+                </div>
+              </div>
+
+              <!-- Step 3: Chọn thời gian -->
+              <div
+                class="booking-step"
+                id="step3-content"
+                style="display: none"
+              >
+                <h2>Chọn thời gian tiêm chủng</h2>
+
+                <div class="datetime-picker">
+                  <div class="form-group">
+                    <label for="bookingDate">Chọn ngày tiêm chủng</label>
+                    <input
+                      type="date"
+                      id="bookingDate"
+                      name="bookingDate"
+                      class="form-control"
+                      min=""
+                      required
+                    />
+                    <input
+                      type="hidden"
+                      name="bookingTime"
+                      id="bookingTimeInput"
+                    />
+                  </div>
+
+                  <div class="time-slots-container">
+                    <h3>Chọn giờ tiêm chủng</h3>
+                    <div class="time-slots">
+                      <div class="time-slot" data-time="08:00">08:00</div>
+                      <div class="time-slot" data-time="08:30">08:30</div>
+                      <div class="time-slot" data-time="09:00">09:00</div>
+                      <div class="time-slot" data-time="09:30">09:30</div>
+                      <div class="time-slot" data-time="10:00">10:00</div>
+                      <div class="time-slot" data-time="10:30">10:30</div>
+                      <div class="time-slot" data-time="11:00">11:00</div>
+                      <div class="time-slot disabled" data-time="11:30">
+                        11:30
+                      </div>
+                      <div class="time-slot" data-time="13:30">13:30</div>
+                      <div class="time-slot" data-time="14:00">14:00</div>
+                      <div class="time-slot" data-time="14:30">14:30</div>
+                      <div class="time-slot" data-time="15:00">15:00</div>
+                      <div class="time-slot" data-time="15:30">15:30</div>
+                      <div class="time-slot" data-time="16:00">16:00</div>
+                      <div class="time-slot" data-time="16:30">16:30</div>
+                      <div class="time-slot" data-time="17:00">17:00</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-back" id="step3-back">
+                    Quay lại
+                  </button>
+                  <button type="button" class="btn-next" id="step3-next">
+                    Tiếp theo
+                  </button>
+                </div>
+              </div>
+
+              <!-- Step 4: Xác nhận thông tin -->
+              <div
+                class="booking-step"
+                id="step4-content"
+                style="display: none"
+              >
+                <h2>Xác nhận thông tin</h2>
+
+                <div class="confirmation-details">
+                  <div class="confirmation-item">
+                    <h3>Thông tin trẻ</h3>
+                    <div class="confirmation-child" id="confirmation-child">
+                      <!-- Sẽ được điền bằng JavaScript -->
+                    </div>
+                  </div>
+
+                  <div class="confirmation-item">
+                    <h3>Dịch vụ</h3>
+                    <div class="confirmation-service" id="confirmation-service">
+                      <!-- Sẽ được điền bằng JavaScript -->
+                    </div>
+                  </div>
+
+                  <div class="confirmation-item">
+                    <h3>Thời gian</h3>
+                    <div class="confirmation-time" id="confirmation-time">
+                      <!-- Sẽ được điền bằng JavaScript -->
+                    </div>
+                  </div>
+                </div>
+
+                <div class="payment-methods">
+                  <h3>Phương thức thanh toán</h3>
+                  <div class="radio-group">
+                    <div class="radio-item">
+                      <input
+                        type="radio"
+                        id="paymentCash"
+                        name="paymentMethod"
+                        value="cash"
+                        checked
+                      />
+                      <label for="paymentCash">Thanh toán tại cơ sở</label>
+                    </div>
+                    <div class="radio-item">
+                      <input
+                        type="radio"
+                        id="paymentBanking"
+                        name="paymentMethod"
+                        value="banking"
+                      />
+                      <label for="paymentBanking">Chuyển khoản ngân hàng</label>
+                    </div>
+                    <div class="radio-item">
+                      <input
+                        type="radio"
+                        id="paymentEwallet"
+                        name="paymentMethod"
+                        value="ewallet"
+                      />
+                      <label for="paymentEwallet"
+                        >Ví điện tử (Momo, ZaloPay...)</label
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="policy">
+                  <h4>Chính sách đặt lịch và hủy lịch</h4>
+                  <p>
+                    - Vui lòng đến đúng giờ hẹn. Nếu đến trễ quá 15 phút, lịch
+                    hẹn có thể bị hủy.
+                  </p>
+                  <p>
+                    - Bạn có thể hủy hoặc thay đổi lịch hẹn ít nhất 24 giờ trước
+                    giờ hẹn.
+                  </p>
+                  <p>
+                    - Trong trường hợp hủy lịch dưới 24 giờ, có thể phát sinh
+                    phí.
+                  </p>
+                  <div class="form-group">
+                    <div class="checkbox-item">
+                      <input
+                        type="checkbox"
+                        id="policyAccept"
+                        name="policyAccept"
+                        required
+                      />
+                      <label for="policyAccept"
+                        >Tôi đã đọc và đồng ý với chính sách đặt lịch và hủy
+                        lịch</label
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-back" id="step4-back">
+                    Quay lại
+                  </button>
+                  <button type="submit" class="btn-primary">
+                    Xác nhận đặt lịch
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="booking-summary">
+            <h3 class="summary-title">Thông tin đặt lịch</h3>
+
+            <div class="summary-content">
+              <div class="summary-item">
+                <span>Trẻ:</span>
+                <span id="summary-child-name">-</span>
+              </div>
+              <div class="summary-item">
+                <span>Dịch vụ:</span>
+                <span id="summary-service-name">-</span>
+              </div>
+              <div class="summary-item">
+                <span>Thời gian:</span>
+                <span id="summary-datetime">-</span>
+              </div>
+              <div class="summary-item">
+                <span>Giá dịch vụ:</span>
+                <span id="summary-price">-</span>
+              </div>
+              <div class="summary-total">
+                <span>Tổng cộng:</span>
+                <span id="summary-total">-</span>
+              </div>
+            </div>
+
+            <div class="summary-note">
+              <p>
+                <i class="fas fa-info-circle"></i> Thanh toán sẽ được thực hiện
+                theo phương thức bạn chọn sau khi xác nhận đặt lịch.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/booking.js"></script>
+    <script>
+      // Set minimum date for booking (today)
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("bookingDate").setAttribute("min", today);
+    </script>
+  </body>
+</html>
