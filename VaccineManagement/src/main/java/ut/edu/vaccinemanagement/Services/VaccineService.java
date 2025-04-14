@@ -12,7 +12,7 @@ public class VaccineService {
     @Autowired
     VaccineRepository vaccineRepository;
 
-    public List<Vaccine> getAllVaccine(Vaccine vaccine) {
+    public List<Vaccine> getAllVaccine() {
         return vaccineRepository.findAll();
     }
 

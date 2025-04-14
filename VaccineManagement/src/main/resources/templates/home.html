@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,3 +9,47 @@
 
 </body>
 </html>
+=======
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chủ | Hệ thống tiêm chủng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+<!-- Banner -->
+<div class="relative">
+    <img src="/images/banner.jpg" alt="Banner" class="w-full h-64 object-cover">
+    <div class="absolute inset-0 bg-blue-900 bg-opacity-30 flex items-center justify-center">
+        <h1 class="text-4xl md:text-5xl text-white font-bold drop-shadow-lg">Hệ thống quản lý tiêm chủng</h1>
+    </div>
+</div>
+
+<!-- Logo + nội dung -->
+<div class="max-w-4xl mx-auto px-4 py-12 flex flex-col items-center text-center">
+    <img src="/images/logo.jpg" alt="Logo" class="w-32 mb-6">
+
+    <h2 class="text-2xl md:text-3xl font-semibold text-green-700 mb-4">Chăm sóc sức khỏe cộng đồng, vì một tương lai khỏe mạnh</h2>
+    <p class="text-gray-600 mb-8 text-base md:text-lg">
+        Chào mừng bạn đến với hệ thống quản lý và theo dõi lịch tiêm chủng. Đăng ký tài khoản hoặc đăng nhập để bắt đầu sử dụng dịch vụ.
+    </p>
+
+    <div class="flex gap-6">
+        <a th:href="@{/register}" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition">
+            Đăng ký
+        </a>
+        <a th:href="@{/login}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition">
+            Đăng nhập
+        </a>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-white border-t mt-16 text-center py-4 text-gray-500 text-sm">
+    © 2025 - Hệ thống tiêm chủng. Bảo vệ sức khỏe cùng cộng đồng.
+</footer>
+
+</body>
+</html>
+>>>>>>> fe8c180 (Update Project)

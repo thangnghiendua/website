@@ -12,4 +12,10 @@ import java.util.List;
 public interface UserChildRepository extends JpaRepository<UserChild, Long> {
     @Query("SELECT uc.child FROM UserChild uc WHERE uc.user.userId = :userId")
     List<Child> findChildrenByUserId(@Param("userId") Long userId);
+
+    // Kiểm tra xem có tồn tại liên kết giữa user và child hay không
+    boolean existsByUserUserIdAndChildChildId(Long userId, Long childId);
+
+    // Xóa liên kết giữa user và child
+    void deleteByUserUserIdAndChildChildId(Long userId, Long childId);
 }

@@ -4,10 +4,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ut.edu.vaccinemanagement.Repositories.AppointmentRepository;
 import ut.edu.vaccinemanagement.Repositories.NotificationRepository;
+import ut.edu.vaccinemanagement.models.*;
 import ut.edu.vaccinemanagement.models.Appointment;
-import ut.edu.vaccinemanagement.models.Notification;
-import ut.edu.vaccinemanagement.models.NotificationStatus;
-import ut.edu.vaccinemanagement.models.NotificationType;
 
 import java.util.Date;
 import java.util.List;
@@ -45,5 +43,29 @@ public class NotificationService {
 
     public List<Notification> getUserNotifications(Long userId) {
         return notificationRepository.findByUserId(userId);
+    }
+
+    public void sendAppointmentConfirmationNotification(Long userId) {
+        // Truy vấn thông tin các cuộc hẹn
+        List<Appointment> appointments = appointmentRepository.findByUser_UserIdAndAppointmentStatus(userId, AppointmentStatus.Pending);
+
+        // Kiểm tra nếu danh sách không rỗng
+        if (!appointments.isEmpty()) {
+            // Lấy cuộc hẹn đầu tiên từ danh sách
+            Appointment appointment = appointments.get(0);
+
+            // Gửi thông báo khi trạng thái cuộc hẹn là "Confirmed"
+            if (appointment.getAppointmentStatus() == AppointmentStatus.Confirmed) {
+                // Tạo và lưu thông báo
+                Notification notification = new Notification();
+                notification.setUser(appointment.getUser());  // Truy cập thông tin user
+                notification.setMessage("Cuộc hẹn của bạn đã được xác nhận. Vui lòng kiểm tra thông tin chi tiết.");
+                notification.setNotificationDate(new Date());
+                notificationRepository.save(notification);
+            }
+        } else {
+            // Nếu không có cuộc hẹn "Pending", có thể xử lý lỗi hoặc thông báo cho người dùng
+            System.out.println("Không tìm thấy cuộc hẹn đang chờ xác nhận.");
+        }
     }
 }

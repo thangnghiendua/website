@@ -34,15 +34,21 @@ public class UserService {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+<<<<<<< HEAD
             if (passwordEncoder.matches(password, user.getUserPassword())) {
                 return Optional.of(user);
+=======
+            if (passwordEncoder.matches(loginRequest.getPassword(), user.getUserPassword())) {
+                return jwtUtil.generateToken(user.getEmail(),user.getUserRole().name());
+>>>>>>> fe8c180 (Update Project)
             }
         }
         return Optional.empty();
     }
 
-    public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
     }
 
     public List<User> getAllUsers() {
@@ -92,5 +98,10 @@ public class UserService {
 
     public List<User> getUsersByRole(UserRole userRole) {
         return userRepository.findByUserRole(userRole);
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
     }
 }

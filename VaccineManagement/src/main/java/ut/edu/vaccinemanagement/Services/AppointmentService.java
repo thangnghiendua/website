@@ -34,23 +34,28 @@ public class AppointmentService {
     @Autowired
     DoctorRepository doctorRepository;
 
-    @Transactional
-    public Appointment bookAppointment(Long userId, Long childId, Long doctorId, Long vaccineId, Date appointmentDate, String appointmentAddress, String roomNumber) {
+    @Autowired
+    NotificationService notificationService;
+
+    public Appointment bookAppointment(Long userId, Long childId, Long vaccineId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy trẻ"));
 
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy bác sĩ"));
-
         Vaccine vaccine = vaccineRepository.findById(vaccineId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy vaccine"));
 
-        if (appointmentDate.before(new Date())) {
-            throw new IllegalArgumentException("Ngày hẹn không hợp lệ");
-        }
+
+        Doctor doctor = doctorRepository.findAll().stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bác sĩ"));
+
+
+        String appointmentAddress = "Phòng tiêm mặc định";
+        String roomNumber = "Phòng 1";
+
+        Date appointmentDate = new Date();
 
         Appointment appointment = new Appointment();
         appointment.setUser(user);
@@ -61,6 +66,21 @@ public class AppointmentService {
         appointment.setAppointmentAddress(appointmentAddress);
         appointment.setRoomNumber(roomNumber);
         appointment.setAppointmentStatus(AppointmentStatus.Pending);
+
+        // Lưu cuộc hẹn
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        return savedAppointment;
+    }
+
+    public Appointment confrimedAppointment(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch tiêm"));
+
+        appointment.setAppointmentStatus(AppointmentStatus.Confirmed);
+
+        // Gửi thông báo xác nhận
+        notificationService.sendAppointmentConfirmationNotification(appointment.getUser().getUserId());
 
         return appointmentRepository.save(appointment);
     }
@@ -87,8 +107,13 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
+<<<<<<< HEAD
     public List<Appointment> appointmentHistoryOfUser (Appointment appointment){
         return appointmentRepository.findByUserId(appointment.getUser().getUserId());
+=======
+    public List<Appointment> appointmentHistoryOfUser(Long userId) {
+        return appointmentRepository.findByUser_UserId(userId);
+>>>>>>> fe8c180 (Update Project)
     }
 
 

@@ -51,4 +51,12 @@ public class UserChild {
     public void setRelationship(Relationship relationship) {
         this.relationship = relationship;
     }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setChild(Child child) {
+        this.child = child;
+    }
 }

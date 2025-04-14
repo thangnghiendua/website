@@ -7,4 +7,6 @@ import java.util.List;
 @Repository
 public interface FeedBackRepository extends JpaRepository<FeedBack, Long> {
     List<FeedBack> findByDoctor_DoctorId(long doctorId);
+
+    List<FeedBack> findByUserUserId(Long userId);
 }

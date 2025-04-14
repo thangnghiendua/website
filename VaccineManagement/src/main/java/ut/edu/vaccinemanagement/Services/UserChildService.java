@@ -17,4 +17,19 @@ public class UserChildService {
     public List<Child> getChildrenByUserId(Long userId) {
         return userChildRepository.findChildrenByUserId(userId);
     }
+
+    public UserChild saveUserChild(UserChild userChild) {
+        return userChildRepository.save(userChild);
+    }
+
+    public boolean isChildOwnedByUser(Long childId, Long userId) {
+        // Kiểm tra xem có liên kết giữa user và child không
+        return userChildRepository.existsByUserUserIdAndChildChildId(userId, childId);
+    }
+
+    public void deleteUserChildRelation(Long childId, Long userId) {
+        // Xóa liên kết giữa user và child
+        userChildRepository.deleteByUserUserIdAndChildChildId(userId, childId);
+    }
+
 }

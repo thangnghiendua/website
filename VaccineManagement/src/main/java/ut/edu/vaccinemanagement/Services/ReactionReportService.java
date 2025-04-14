@@ -35,8 +35,12 @@ public class ReactionReportService {
         User user = userRepository.findById(userId).orElse(null);
         if (user != null) {
             report.setUser(user);
-            return reactionReportRepository.save(report); // Lưu báo cáo triệu chứng của người dùng
+            return reactionReportRepository.save(report);
         }
         return null;
+    }
+
+    public List<ReactionReport> getReportsByUserId(Long userId) {
+        return reactionReportRepository.findByUserUserId(userId);
     }
 }

@@ -19,11 +19,15 @@ public class FeedBackService {
     public List<FeedBack> getFeedbacksByDoctorId(long doctorId) {
         return feedbackRepository.findByDoctor_DoctorId(doctorId);
     }
-    public FeedBack saveFeedback(FeedBack feedback) {
+    public FeedBack sendFeedback(FeedBack feedback) {
         if (!doctorRepository.existsById(feedback.getDoctor().getDoctorId())) {
             throw new IllegalArgumentException("Bác sĩ không tồn tại");
         }
 
         return feedbackRepository.save(feedback);
+    }
+
+    public List<FeedBack> getFeedbacksByUserId(Long userId) {
+        return feedbackRepository.findByUserUserId(userId);
     }
 }
