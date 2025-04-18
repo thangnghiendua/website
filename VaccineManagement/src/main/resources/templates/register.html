@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký - Hệ thống Quản lý Vaccine</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="auth-form">
+        <h1>Đăng ký tài khoản</h1>
+        <div id="error-message" class="error-message"></div>
+
+        <form id="register-form">
+          <div class="form-group">
+            <label for="userName">Họ và tên:</label>
+            <input type="text" id="userName" name="userName" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="gender">Giới tính:</label>
+            <select id="gender" name="gender" required>
+              <option value="Male">Nam</option>
+              <option value="Female">Nữ</option>
+              <option value="Other">Khác</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="birthDate">Ngày sinh:</label>
+            <input type="date" id="birthDate" name="birthDate" required />
+          </div>
+
+          <div class="form-group">
+            <label for="userPassword">Mật khẩu:</label>
+            <input
+              type="password"
+              id="userPassword"
+              name="userPassword"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Xác nhận mật khẩu:</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary">Đăng ký</button>
+        </form>
+
+        <div class="auth-links">
+          <p>Đã có tài khoản? <a href="index.html">Đăng nhập</a></p>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+  </body>
+</html>

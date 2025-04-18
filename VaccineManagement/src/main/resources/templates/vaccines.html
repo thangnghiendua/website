@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Danh sách Vaccine - Hệ thống Quản lý Vaccine</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="container">
+        <h1>Hệ thống Quản lý Vaccine</h1>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="dashboard.html">Trang chủ</a></li>
+            <li><a href="vaccines.html" class="active">Vaccine</a></li>
+            <li><a href="children.html">Trẻ em</a></li>
+            <li><a href="appointments.html">Lịch hẹn</a></li>
+            <li><a href="#" id="logout-btn">Đăng xuất</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <h2>Danh sách Vaccine</h2>
+
+      <div class="filter-options">
+        <label>Loại gói:</label>
+        <select id="package-type-filter">
+          <option value="">Tất cả</option>
+          <option value="Single_Package">Gói đơn</option>
+          <option value="Combo">Gói combo</option>
+          <option value="Personalization">Gói cá nhân hóa</option>
+        </select>
+      </div>
+
+      <div id="vaccines-list" class="grid-list">
+        <p>Đang tải danh sách vaccine...</p>
+      </div>
+
+      <div id="booking-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn">&times;</span>
+          <h3>Đặt lịch tiêm</h3>
+
+          <form id="booking-form">
+            <input type="hidden" id="vaccine-id" />
+
+            <div class="form-group">
+              <label for="child-select">Chọn trẻ:</label>
+              <select id="child-select" required>
+                <option value="">Chọn trẻ</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Đặt lịch</button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/vaccine.js"></script>
+  </body>
+</html>

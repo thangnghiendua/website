@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Hệ thống Quản lý Vaccine</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="container">
+        <h1>Hệ thống Quản lý Vaccine</h1>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="dashboard.html" class="active">Trang chủ</a></li>
+            <li><a href="vaccines.html">Vaccine</a></li>
+            <li><a href="children.html">Trẻ em</a></li>
+            <li><a href="appointments.html">Lịch hẹn</a></li>
+            <li><a href="#" id="logout-btn">Đăng xuất</a></li>
+          </ul>
+        </nav>
+        <div id="user-info">
+          <span id="user-name">Đang tải...</span>
+          <span id="wallet-balance">Số dư: Đang tải...</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <h2>Bảng điều khiển</h2>
+
+      <div class="dashboard-cards">
+        <div class="card">
+          <h3>Thông báo mới</h3>
+          <div id="notifications-list">
+            <p>Đang tải thông báo...</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Lịch hẹn sắp tới</h3>
+          <div id="upcoming-appointments">
+            <p>Đang tải lịch hẹn...</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Trẻ em của bạn</h3>
+          <div id="children-list">
+            <p>Đang tải danh sách trẻ...</p>
+          </div>
+          <button id="add-child-btn" class="btn btn-small">Thêm trẻ</button>
+        </div>
+
+        <div class="card">
+          <h3>Ví của bạn</h3>
+          <div id="wallet-info">
+            <p>Số dư: <span id="balance-amount">Đang tải...</span></p>
+            <div class="wallet-actions">
+              <button id="recharge-btn" class="btn btn-small">Nạp tiền</button>
+              <button id="transfer-btn" class="btn btn-small">
+                Chuyển khoản
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

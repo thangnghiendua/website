@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý Trẻ em - Hệ thống Quản lý Vaccine</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="container">
+        <h1>Hệ thống Quản lý Vaccine</h1>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="dashboard.html">Trang chủ</a></li>
+            <li><a href="vaccines.html">Vaccine</a></li>
+            <li><a href="children.html" class="active">Trẻ em</a></li>
+            <li><a href="appointments.html">Lịch hẹn</a></li>
+            <li><a href="#" id="logout-btn">Đăng xuất</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <h2>Quản lý Trẻ em</h2>
+
+      <button id="add-child-btn" class="btn btn-primary">Thêm trẻ</button>
+
+      <div id="children-list" class="grid-list">
+        <p>Đang tải danh sách trẻ...</p>
+      </div>
+
+      <div id="child-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn">&times;</span>
+          <h3 id="modal-title">Thêm trẻ</h3>
+
+          <form id="child-form">
+            <input type="hidden" id="child-id" />
+
+            <div class="form-group">
+              <label for="child-name">Tên trẻ:</label>
+              <input type="text" id="child-name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="child-gender">Giới tính:</label>
+              <select id="child-gender" required>
+                <option value="Male">Nam</option>
+                <option value="Female">Nữ</option>
+                <option value="Other">Khác</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="child-birthdate">Ngày sinh:</label>
+              <input type="date" id="child-birthdate" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Lưu</button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/children.js"></script>
+  </body>
+</html>

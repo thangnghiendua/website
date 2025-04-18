@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lịch hẹn - Hệ thống Quản lý Vaccine</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="container">
+        <h1>Hệ thống Quản lý Vaccine</h1>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="dashboard.html">Trang chủ</a></li>
+            <li><a href="vaccines.html">Vaccine</a></li>
+            <li><a href="children.html">Trẻ em</a></li>
+            <li><a href="appointments.html" class="active">Lịch hẹn</a></li>
+            <li><a href="#" id="logout-btn">Đăng xuất</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <h2>Lịch hẹn</h2>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="upcoming">Sắp tới</button>
+        <button class="tab-btn" data-tab="history">Lịch sử</button>
+      </div>
+
+      <div id="appointments-list" class="list-view">
+        <p>Đang tải lịch hẹn...</p>
+      </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/appointments.js"></script>
+  </body>
+</html>
