@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản lý tiêm chủng</title>
+  <link rel="stylesheet" href="/css/user.css" />
+</head>
+<body>
+<div class="sidebar">
+  <h2>VaccineApp</h2>
+  <ul>
+    <li onclick="showSection('appointments')">📅 Cuộc hẹn</li>
+    <li onclick="showSection('notifications')">🔔 Thông báo</li>
+    <li onclick="showSection('children')">👶 Trẻ em</li>
+    <li onclick="showSection('feedback')">💬 Góp ý</li>
+    <li onclick="showSection('reactions')">⚠️ Báo cáo</li>
+    <li onclick="showSection('wallet')">💰 Ví tiền</li>
+    <li onclick="showSection('vaccines')">💉 Vắc-xin</li>
+    <li onclick="showSection('profile')">👤 Hồ sơ</li>
+  </ul>
+</div>
+
+<div class="content">
+  <section id="appointments" class="section hidden"></section>
+  <section id="notifications" class="section hidden"></section>
+  <section id="children" class="section hidden"></section>
+  <section id="feedback" class="section hidden">
+    <!-- Gửi phản hồi -->
+  </section>
+  <section id="reactions" class="section hidden"></section>
+  <section id="wallet" class="section hidden"></section>
+  <section id="vaccines" class="section hidden"></section>
+  <section id="profile" class="section hidden">
+    <!-- Chỉnh sửa hồ sơ -->
+  </section>
+</div>
+
+<script src="/js/user.js"></script>
+</body>
+</html>

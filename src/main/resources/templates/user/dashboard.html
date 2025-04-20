@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang người dùng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Thêm một chút bóng đổ cho các nút để tạo chiều sâu */
+    .btn-custom {
+      transition: all 0.3s ease;
+    }
+    .btn-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    /* Biểu tượng chuông thông báo ở góc phải */
+    .notification-bell {
+      position: fixed;
+      top: 20px;
+      right: 20px;  /* Đặt chuông ở góc phải */
+      background-color: #fbbf24; /* Màu vàng */
+      color: white;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      flex-direction: column;  /* Để cho chữ nằm dưới biểu tượng chuông */
+    }
+    .notification-bell:hover {
+      background-color: #f59e0b; /* Màu vàng đậm khi hover */
+    }
+    /* Chữ Thông báo */
+    .notification-text {
+      margin-top: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #f59e0b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-r from-green-100 to-green-200 min-h-screen font-sans">
+
+<header class="bg-gradient-to-r from-green-600 to-green-800 text-white py-6 shadow-lg">
+  <h1 class="text-4xl text-center font-extrabold">Chào mừng bạn đến với dịch vụ của chúng tôi!</h1>
+  <p class="text-center mt-2">Quản lý hồ sơ và dịch vụ tiêm chủng một cách dễ dàng</p>
+</header>
+
+<main class="max-w-4xl mx-auto mt-12 bg-white p-8 rounded-2xl shadow-xl">
+  <h2 class="text-2xl font-semibold text-gray-800 mb-8 text-center">Hãy chọn một chức năng bên dưới để tiếp tục</h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Các mục chức năng -->
+    <div class="flex justify-center">
+      <a href="/user/profile" class="btn-custom px-6 py-6 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white text-lg font-semibold rounded-lg shadow-lg w-full text-center hover:bg-gradient-to-l">
+        <span class="block mb-2">Xem hồ sơ</span>
+        <i class="fas fa-user-circle text-2xl"></i>
+      </a>
+    </div>
+    <!-- Trẻ em -->
+    <div class="flex justify-center">
+      <a href="/user/children" class="btn-custom px-6 py-6 bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white text-lg font-semibold rounded-lg shadow-lg w-full text-center hover:bg-gradient-to-l">
+        <span class="block mb-2">Trẻ em</span>
+        <i class="fas fa-child text-2xl"></i>
+      </a>
+    </div>
+    <!-- Cuộc hẹn -->
+    <div class="flex justify-center">
+      <a href="/user/appointments" class="btn-custom px-6 py-6 bg-gradient-to-r from-green-600 via-green-700 to-green-800 text-white text-lg font-semibold rounded-lg shadow-lg w-full text-center hover:bg-gradient-to-l">
+        <span class="block mb-2">Cuộc hẹn</span>
+        <i class="fas fa-calendar-check text-2xl"></i>
+      </a>
+    </div>
+    <!-- Vaccine -->
+    <div class="flex justify-center">
+      <a href="/user/vaccines" class="btn-custom px-6 py-6 bg-gradient-to-r from-green-700 via-green-800 to-green-900 text-white text-lg font-semibold rounded-lg shadow-lg w-full text-center hover:bg-gradient-to-l">
+        <span class="block mb-2">Vaccine</span>
+        <i class="fas fa-syringe text-2xl"></i>
+      </a>
+    </div>
+    <!-- Feedback -->
+    <div class="flex justify-center">
+      <a href="/user/feedback" class="btn-custom px-6 py-6 bg-gradient-to-r from-green-800 via-green-900 to-green-950 text-white text-lg font-semibold rounded-lg shadow-lg w-full text-center hover:bg-gradient-to-l">
+        <span class="block mb-2">Gửi phản hồi</span>
+        <i class="fas fa-comments text-2xl"></i>
+      </a>
+    </div>
+    <!-- Báo cáo triệu chứng -->
+    <div class="flex justify-center">
+      <a href="/user/symptom-report" class="btn-custom px-6 py-6 bg-gradient-to-r from-green-900 via-green-950 to-green-1000 text-white text-lg font-semibold rounded-lg shadow-lg w-full text-center hover:bg-gradient-to-l">
+        <span class="block mb-2">Báo cáo triệu chứng</span>
+        <i class="fas fa-briefcase-medical text-2xl"></i>
+      </a>
+    </div>
+    <!-- Đăng xuất -->
+    <div class="flex justify-center">
+      <a href="/logout" class="btn-custom px-6 py-6 bg-gradient-to-r from-green-600 to-green-700 text-white text-lg font-semibold rounded-lg shadow-lg w-full text-center hover:bg-gradient-to-l">
+        <span class="block mb-2">Đăng xuất</span>
+        <i class="fas fa-sign-out-alt text-2xl"></i>
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- Thêm FontAwesome để biểu tượng hiển thị -->
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+<!-- Thêm chuông thông báo và chữ Thông báo -->
+<div class="notification-bell" onclick="window.location.href='/user/notifications'">
+  <i class="fas fa-bell text-2xl"></i>
+  <div class="notification-text">Thông báo</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Danh sách Vaccine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen font-sans">
+
+<header class="bg-blue-700 text-white py-6 shadow-md">
+  <h1 class="text-3xl text-center font-bold">Danh sách Vaccine</h1>
+</header>
+
+<main class="max-w-5xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg">
+  <!-- Tìm kiếm -->
+  <section class="mb-6">
+    <form id="searchForm" class="flex flex-wrap items-center gap-4">
+      <label for="packageType" class="text-lg font-semibold">Loại gói:</label>
+      <select id="packageType" class="px-4 py-2 border rounded-lg">
+        <option value="">Tất cả</option>
+        <option value="Combo">Combo</option>
+        <option value="SINGLE">SINGLE</option>
+        <option value="BASIC">BASIC</option>
+        <!-- Thêm nếu có -->
+      </select>
+      <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-800">
+        Tìm kiếm
+      </button>
+    </form>
+  </section>
+
+  <!-- Bảng danh sách -->
+  <section>
+    <table class="w-full table-auto border-collapse">
+      <thead class="bg-gray-200">
+      <tr>
+        <th class="border px-4 py-2">ID</th>
+        <th class="border px-4 py-2">Tên Vaccine</th>
+        <!-- <th class="border px-4 py-2">Nhà Sản Xuất</th> --> <!-- Bỏ nếu chưa có -->
+        <th class="border px-4 py-2">Loại Gói</th>
+        <th class="border px-4 py-2">Giá</th>
+      </tr>
+      </thead>
+      <tbody id="vaccineTableBody" class="bg-white">
+      <!-- Vaccine rows sẽ được thêm bằng JavaScript -->
+      </tbody>
+    </table>
+    <p id="noDataMessage" class="text-center mt-4 text-gray-500 hidden">Không tìm thấy vaccine nào.</p>
+  </section>
+</main>
+
+<script>
+  const token = sessionStorage.getItem('token');
+  const vaccineTableBody = document.getElementById("vaccineTableBody");
+  const noDataMessage = document.getElementById("noDataMessage");
+
+  document.addEventListener("DOMContentLoaded", fetchAllVaccines);
+
+  document.getElementById("searchForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const type = document.getElementById("packageType").value;
+    if (type) {
+      fetchVaccinesByType(type);
+    } else {
+      fetchAllVaccines();
+    }
+  });
+
+  function fetchAllVaccines() {
+    fetch('/api/user/vaccines', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+            .then(res => {
+              if (res.status === 204) return [];
+              return res.json();
+            })
+            .then(data => renderVaccines(data))
+            .catch(err => console.error('Lỗi khi lấy tất cả vaccine:', err));
+  }
+
+  function fetchVaccinesByType(type) {
+    fetch(`/api/user/vaccines/by-package-type?packageType=${type}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+            .then(res => {
+              if (res.status === 204) return [];
+              return res.json();
+            })
+            .then(data => renderVaccines(data))
+            .catch(err => console.error('Lỗi khi lọc vaccine:', err));
+  }
+
+  function renderVaccines(vaccines) {
+    vaccineTableBody.innerHTML = '';
+    if (vaccines.length === 0) {
+      noDataMessage.classList.remove("hidden");
+      return;
+    }
+    noDataMessage.classList.add("hidden");
+
+    vaccines.forEach(v => {
+      const row = document.createElement("tr");
+      row.classList.add("hover:bg-gray-100");
+
+      row.innerHTML = `
+        <td class="border px-4 py-2">${v.vaccineId}</td>
+        <td class="border px-4 py-2">${v.vaccineName}</td>
+        <!--<td class="border px-4 py-2">${v.manufacturer || '---'}</td>-->
+        <td class="border px-4 py-2">${v.packageType}</td>
+        <td class="border px-4 py-2">${new Intl.NumberFormat('vi-VN').format(v.price)} đ</td>
+      `;
+      vaccineTableBody.appendChild(row);
+    });
+  }
+</script>
+
+</body>
+</html>

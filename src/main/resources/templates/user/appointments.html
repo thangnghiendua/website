@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Cuộc Hẹn Tiêm Chủng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-green-100 to-green-200 min-h-screen font-sans">
+
+<header class="bg-gradient-to-r from-green-600 to-green-800 text-white py-6 shadow-lg">
+  <h1 class="text-4xl text-center font-extrabold">Quản Lý Cuộc Hẹn Tiêm Chủng</h1>
+</header>
+
+<main class="max-w-4xl mx-auto mt-12 bg-white p-8 rounded-2xl shadow-xl">
+  <!-- Phần Đặt Cuộc Hẹn -->
+  <section>
+    <h2 class="text-2xl font-semibold text-gray-800 mb-8 text-center">Đặt Cuộc Hẹn</h2>
+    <form id="bookForm" class="space-y-6">
+      <div class="flex flex-col">
+        <label for="childId" class="text-lg font-semibold text-gray-800">ID của trẻ</label>
+        <input type="number" id="childId" class="p-2 border border-gray-400 rounded-lg" required>
+      </div>
+      <div class="flex flex-col">
+        <label for="vaccineId" class="text-lg font-semibold text-gray-800">ID của vaccine</label>
+        <input type="number" id="vaccineId" class="p-2 border border-gray-400 rounded-lg" required>
+      </div>
+      <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Đặt Cuộc Hẹn</button>
+    </form>
+  </section>
+
+  <!-- Phần Lịch Sử Cuộc Hẹn -->
+  <section class="mt-12">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-8 text-center">Lịch Sử Cuộc Hẹn</h2>
+    <div id="appointmentsHistory">
+      <!-- Danh sách các cuộc hẹn sẽ được cập nhật ở đây -->
+    </div>
+  </section>
+</main>
+
+<script>
+  // Lấy token từ localStorage
+  const token = sessionStorage.getItem('token');  // Thay đổi từ localStorage thành sessionStorage
+
+  // Kiểm tra xem token có tồn tại không
+  if (!token) {
+    alert("Bạn cần phải đăng nhập để truy cập trang này!");
+    window.location.href = '/login'; // Chuyển hướng đến trang đăng nhập nếu không có token
+  }
+
+  // Lấy lịch sử cuộc hẹn khi trang được tải
+  document.addEventListener("DOMContentLoaded", function() {
+    fetchAppointmentsHistory();
+  });
+
+  // Hàm lấy lịch sử cuộc hẹn
+  function fetchAppointmentsHistory() {
+    fetch('/api/user/history', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+              const historyContainer = document.getElementById("appointmentsHistory");
+              historyContainer.innerHTML = ''; // Xóa nội dung cũ trước khi cập nhật
+
+              data.forEach(appointment => {
+                console.log(appointment);
+                const appointmentElement = document.createElement("div");
+                appointmentElement.classList.add("flex", "justify-between", "items-center", "border-b", "border-gray-300", "py-4");
+                appointmentElement.innerHTML = `
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800">ID Cuộc Hẹn: ${appointment.appointmentId}</h3>
+                    <p class="text-gray-600">Ngày: ${new Date(appointment.appointmentDate).toLocaleString()}</p>
+                    <p class="text-gray-600">Trạng Thái: ${appointment.appointmentStatus}</p>
+                    <p class="text-gray-600">Tên Trẻ: ${appointment.child ? appointment.child.name : 'Chưa có trẻ'}</p>
+                    <p class="text-gray-600">Tên Bác Sĩ: ${appointment.doctor ? appointment.doctor.name : 'Chưa có bác sĩ'}</p>
+                    <p class="text-gray-600">Tên Vaccine: ${appointment.vaccine ? appointment.vaccine.name : 'Chưa có vaccine'}</p>
+                    <p class="text-gray-600">Địa Chỉ: ${appointment.appointmentAddress}</p>
+                    <p class="text-gray-600">Số Phòng: ${appointment.roomNumber || 'Chưa có số phòng'}</p>
+                </div>
+                <div class="flex space-x-4">
+                    <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700" onclick="cancelAppointment(${appointment.appointmentId})">Hủy</button>
+                    <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-700" onclick="completeAppointment(${appointment.appointmentId})">Hoàn thành</button>
+                </div>
+            `;
+                historyContainer.appendChild(appointmentElement);
+              });
+            })
+            .catch(error => console.error('Error fetching appointments history:', error));
+  }
+
+  // Hàm hủy cuộc hẹn
+  function cancelAppointment(appointmentId) {
+    fetch(`/api/user/cancel/${appointmentId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Gắn token vào header
+        'Content-Type': 'application/json'
+      }
+    })
+            .then(response => response.json())
+            .then(data => {
+              alert(data.message || "Cuộc hẹn đã được hủy thành công");
+              fetchAppointmentsHistory(); // Cập nhật lại danh sách sau khi hủy
+            })
+            .catch(error => console.error('Error cancelling appointment:', error));
+  }
+
+  // Hàm hoàn thành cuộc hẹn
+  function completeAppointment(appointmentId) {
+    fetch(`/api/user/complete/${appointmentId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Gắn token vào header
+        'Content-Type': 'application/json'
+      }
+    })
+            .then(response => response.json())
+            .then(data => {
+              alert(data.message || "Cuộc hẹn đã được hoàn thành");
+              fetchAppointmentsHistory(); // Cập nhật lại danh sách sau khi hoàn thành
+            })
+            .catch(error => console.error('Error completing appointment:', error));
+  }
+
+  // Hàm đặt cuộc hẹn
+  document.getElementById("bookForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const childId = document.getElementById("childId").value;
+    const vaccineId = document.getElementById("vaccineId").value;
+
+    // Kiểm tra dữ liệu có hợp lệ không
+    if (!childId || !vaccineId) {
+      alert("Vui lòng nhập ID hợp lệ cho trẻ và vaccine!");
+      return;
+    }
+
+    // Kiểm tra nếu ID là số dương
+    if (childId <= 0 || vaccineId <= 0) {
+      alert("ID của trẻ và vaccine phải là số dương!");
+      return;
+    }
+
+    fetch('/api/user/book', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Gắn token vào header
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        childId: childId,
+        vaccineId: vaccineId
+      })
+    })
+            .then(response => {
+              if (!response.ok) {
+                return response.json().then(errorData => {
+                  throw new Error(errorData.message || "Đặt cuộc hẹn không thành công");
+                });
+              }
+              return response.json();
+            })
+            .then(data => {
+              alert('Cuộc hẹn đã được đặt thành công!');
+              fetchAppointmentsHistory();
+            })
+            .catch(error => {
+              alert(error.message || 'Đã có lỗi xảy ra!');
+              console.error('Error booking appointment:', error);
+            });
+  });
+</script>
+
+</body>
+</html>

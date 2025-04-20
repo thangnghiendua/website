@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<!-- Header -->
+<header class="bg-blue-600 text-white p-4 shadow">
+    <h1 class="text-2xl font-bold">Hệ thống quản lý tiêm chủng - Trang Admin</h1>
+</header>
+
+<div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow h-screen">
+        <nav class="flex flex-col p-4 space-y-2">
+            <button onclick="showSection('dashboard')" class="hover:bg-blue-100 p-2 rounded">📊 Tổng quan</button>
+            <button onclick="showSection('users')" class="hover:bg-blue-100 p-2 rounded">👥 Quản lý người dùng</button>
+            <button onclick="showSection('vaccines')" class="hover:bg-blue-100 p-2 rounded">💉 Quản lý vaccine</button>
+        </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6">
+
+        <!-- Dashboard -->
+        <section id="dashboard" class="space-y-4">
+            <h2 class="text-xl font-semibold mb-4">📊 Tổng quan thống kê</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="text-lg font-semibold">👶 Số trẻ theo giới tính</h3>
+                    <div id="genderStats">Đang tải...</div>
+                </div>
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="text-lg font-semibold">📈 Số trẻ theo độ tuổi</h3>
+                    <div id="ageStats">Đang tải...</div>
+                </div>
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="text-lg font-semibold">📅 Lịch hẹn theo tháng</h3>
+                    <div id="appointmentStats">Đang tải...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- User management -->
+        <section id="users" class="hidden space-y-4">
+            <h2 class="text-xl font-semibold mb-4">👥 Quản lý người dùng</h2>
+            <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ Thêm người dùng</button>
+            <div id="userTable" class="bg-white p-4 mt-4 rounded shadow">Đang tải danh sách...</div>
+        </section>
+
+        <!-- Vaccine management -->
+        <section id="vaccines" class="hidden space-y-4">
+            <h2 class="text-xl font-semibold mb-4">💉 Quản lý vaccine</h2>
+            <div id="vaccineTable" class="bg-white p-4 mt-4 rounded shadow">Đang tải danh sách vaccine...</div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+    function showSection(id) {
+        document.querySelectorAll('main section').forEach(section => section.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    // Ví dụ fetch dữ liệu nhanh (bạn thay thế bằng gọi API thực)
+    async function loadDashboardData() {
+        try {
+            const gender = await fetch('/api/admin/children-by-gender').then(res => res.json());
+            const age = await fetch('/api/admin/children-by-age-group').then(res => res.json());
+            const appointments = await fetch('/api/admin/monthly-appointments?year=2024').then(res => res.json());
+
+            document.getElementById("genderStats").textContent = JSON.stringify(gender, null, 2);
+            document.getElementById("ageStats").textContent = JSON.stringify(age, null, 2);
+            document.getElementById("appointmentStats").textContent = JSON.stringify(appointments, null, 2);
+        } catch (err) {
+            console.error("Lỗi khi load dashboard:", err);
+        }
+    }
+
+    // Tự động tải dashboard khi vào trang
+    window.onload = loadDashboardData;
+</script>
+</body>
+</html>
