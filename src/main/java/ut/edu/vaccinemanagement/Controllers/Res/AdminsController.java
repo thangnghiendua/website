@@ -51,7 +51,9 @@ public class AdminsController {
         return userService.getAllUsers();
     }
 
-    @PostMapping("/users")
+
+    @PostMapping("/add/users")
+
     public User addUser(@RequestBody User user) {
         return userService.addUser(user);
     }
@@ -73,8 +75,15 @@ public class AdminsController {
     }
 
     @GetMapping("/users/role")
-    public List<User> getUsersByRole(@RequestParam UserRole userRole) {
-        return userService.getUsersByRole(userRole);
+
+    public List<User> getUsersByRole(@RequestParam String userRole) {
+        try {
+            UserRole role = UserRole.valueOf(userRole.toUpperCase());
+            return userService.getUsersByRole(role);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid role: " + userRole);
+        }
+
     }
 
     @GetMapping("/vaccines")

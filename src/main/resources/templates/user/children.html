@@ -4,86 +4,255 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý Trẻ Em</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
-    .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
-    h1, h2 { text-align: center; }
-    form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
-    input, select, button { padding: 10px; font-size: 16px; }
-    .child-card { border: 1px solid #ccc; padding: 15px; border-radius: 6px; margin: 10px 0; background: #f9f9f9; }
-    .child-card p { margin: 5px 0; }
-    .child-card button { margin-right: 10px; }
-    .alert { padding: 10px; margin-bottom: 10px; border-radius: 5px; display: none; }
-    .success { background-color: #4caf50; color: white; }
-    .error { background-color: #f44336; color: white; }
-  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
-<body>
-<div class="container">
-  <h1>Quản lý Trẻ Em</h1>
+<body class="bg-gradient-to-r from-green-100 to-green-200 min-h-screen font-sans">
+<div class="container max-w-4xl mx-auto mt-12 bg-white p-8 rounded-2xl shadow-xl">
+  <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-8">Quản lý Trẻ Em</h1>
 
-  <div id="alert" class="alert"></div>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white p-4 rounded-lg shadow-lg">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+      <p class="mt-4 text-gray-700">Đang xử lý...</p>
+    </div>
+  </div>
 
-  <h2>Thêm Trẻ Mới</h2>
-  <form id="addChildForm">
-    <input type="text" id="childName" placeholder="Tên trẻ" required>
-    <select id="gender" required>
-      <option value="">-- Chọn giới tính --</option>
-      <option value="MALE">Nam</option>
-      <option value="FEMALE">Nữ</option>
-      <option value="OTHER">Khác</option>
-    </select>
-    <input type="date" id="birthDay" required>
-    <button type="submit">Thêm trẻ</button>
-  </form>
+  <!-- Alert Message -->
+  <div id="alertMessage" class="hidden mb-4 p-4 rounded-lg"></div>
 
-  <h2>Danh sách Trẻ</h2>
-  <div id="childrenList"></div>
+  <!-- Form Thêm Trẻ -->
+  <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Thêm Trẻ Mới</h2>
+    <form id="addChildForm" class="space-y-4">
+      <div>
+        <label for="childName" class="block text-sm font-medium text-gray-700">Tên trẻ</label>
+        <input type="text" id="childName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+      </div>
+      <div>
+        <label for="gender" class="block text-sm font-medium text-gray-700">Giới tính</label>
+        <select id="gender" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+          <option value="">-- Chọn giới tính --</option>
+          <option value="Male">Nam</option>
+          <option value="Female">Nữ</option>
+          <option value="Other">Khác</option>
+        </select>
+      </div>
+      <div>
+        <label for="birthDay" class="block text-sm font-medium text-gray-700">Ngày sinh</label>
+        <input type="date" id="birthDay" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+      </div>
+      <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
+        Thêm trẻ
+      </button>
+    </form>
+  </div>
+
+  <!-- Danh sách Trẻ -->
+  <div class="bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Danh sách Trẻ</h2>
+    <div id="childrenList" class="space-y-4"></div>
+  </div>
+</div>
+
+<!-- Modal Chỉnh Sửa -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+  <div class="fixed inset-0 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">Chỉnh sửa thông tin trẻ</h3>
+      <form id="editForm" class="space-y-4">
+        <input type="hidden" id="editChildId">
+        <div>
+          <label for="editChildName" class="block text-sm font-medium text-gray-700">Tên trẻ</label>
+          <input type="text" id="editChildName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+        </div>
+        <div>
+          <label for="editGender" class="block text-sm font-medium text-gray-700">Giới tính</label>
+          <select id="editGender" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+            <option value="Male">Nam</option>
+            <option value="Female">Nữ</option>
+            <option value="Other">Khác</option>
+          </select>
+        </div>
+        <div>
+          <label for="editBirthDay" class="block text-sm font-medium text-gray-700">Ngày sinh</label>
+          <input type="date" id="editBirthDay" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+        </div>
+        <div class="flex justify-end space-x-4">
+          <button type="button" onclick="closeEditModal()" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-200">
+            Hủy
+          </button>
+          <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
+            Lưu thay đổi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <script>
-  const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('token');
+
   if (!token) {
     alert("Bạn cần đăng nhập để tiếp tục.");
     window.location.href = "/login";
   }
+
+
+  // Hiển thị loading overlay
+  function showLoading() {
+    document.getElementById('loadingOverlay').classList.remove('hidden');
+  }
+
+  // Ẩn loading overlay
+  function hideLoading() {
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }
+
+  // Hiển thị thông báo
+  function showAlert(message, type = 'success') {
+    const alertDiv = document.getElementById('alertMessage');
+    alertDiv.textContent = message;
+    alertDiv.className = `mb-4 p-4 rounded-lg ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+    alertDiv.classList.remove('hidden');
+    setTimeout(() => alertDiv.classList.add('hidden'), 5000);
+  }
+
 
   // Load danh sách trẻ em khi vào trang
   document.addEventListener("DOMContentLoaded", fetchChildren);
 
   // Fetch danh sách
   function fetchChildren() {
+
+    showLoading();
     fetch('/api/user/children', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-            .then(res => res.json())
-            .then(data => {
-              const list = document.getElementById('childrenList');
-              list.innerHTML = '';
-              data.forEach(child => {
-                const div = document.createElement('div');
-                div.className = 'child-card';
-                div.innerHTML = `
-          <p><strong>Tên:</strong> ${child.childName}</p>
-          <p><strong>Giới tính:</strong> ${child.gender}</p>
-          <p><strong>Ngày sinh:</strong> ${new Date(child.birthDay).toLocaleDateString()}</p>
-          <button onclick="editChild(${child.childId})">Sửa</button>
-          <button onclick="deleteChild(${child.childId})">Xóa</button>
+    .then(res => {
+      console.log('Response status:', res.status);
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error('Error response:', text);
+          throw new Error(`Lỗi ${res.status}: ${text}`);
+        });
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log('Received data:', data);
+      const list = document.getElementById('childrenList');
+      list.innerHTML = '';
+      
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p class="text-center text-gray-500">Không có trẻ nào được thêm.</p>';
+        hideLoading();
+        return;
+      }
+
+      data.forEach(child => {
+        const div = document.createElement('div');
+        div.className = 'bg-white p-4 rounded-lg shadow border border-gray-200';
+        
+        // Xử lý định dạng ngày tháng an toàn
+        let formattedDate = 'Không xác định';
+        try {
+          const birthDate = new Date(child.birthDay);
+          if (!isNaN(birthDate.getTime())) {
+            formattedDate = birthDate.toLocaleDateString('vi-VN');
+          }
+        } catch (e) {
+          console.error('Error formatting date:', e);
+        }
+        
+        // Escaping dữ liệu để tránh lỗi với dấu nháy
+        const escapedName = child.childName.replace(/'/g, "\\'");
+        const birthDayISO = child.birthDay ? child.birthDay.split('T')[0] : '';
+        
+        div.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div class="space-y-2">
+              <p class="text-lg font-semibold text-gray-800">${child.childName}</p>
+              <p class="text-gray-600">Giới tính: ${child.gender}</p>
+              <p class="text-gray-600">Ngày sinh: ${formattedDate}</p>
+            </div>
+            <div class="flex space-x-2">
+              <button data-id="${child.childId}" 
+                      data-name="${escapedName}" 
+                      data-gender="${child.gender}" 
+                      data-birthday="${birthDayISO}"
+                      class="edit-btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                Sửa
+              </button>
+              <button data-id="${child.childId}" 
+                      class="delete-btn bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200">
+                Xóa
+              </button>
+            </div>
+          </div>
         `;
-                list.appendChild(div);
-              });
-            })
-            .catch(err => showAlert("Không thể lấy danh sách trẻ.", "error"));
+        
+        // Thêm event listeners cho nút sửa và xóa
+        const editButton = div.querySelector('.edit-btn');
+        editButton.addEventListener('click', function() {
+          const id = this.getAttribute('data-id');
+          const name = this.getAttribute('data-name');
+          const gender = this.getAttribute('data-gender');
+          const birthDay = this.getAttribute('data-birthday');
+          openEditModal(id, name, gender, birthDay);
+        });
+        
+        const deleteButton = div.querySelector('.delete-btn');
+        deleteButton.addEventListener('click', function() {
+          const id = this.getAttribute('data-id');
+          confirmDelete(id);
+        });
+        
+        list.appendChild(div);
+      });
+      hideLoading();
+    })
+    .catch(err => {
+      console.error('Error fetching children:', err);
+      showAlert(`Không thể tải danh sách trẻ: ${err.message}`, 'error');
+      hideLoading();
+    });
   }
 
+  // Thêm hàm chuyển đổi giá trị Gender
+  function normalizeGender(gender) {
+    // Chuẩn hóa gender theo định dạng enum: Male, Female, Other
+    if (!gender) return 'Male';
+    
+    // Viết hoa chữ đầu tiên, chữ thường còn lại
+    return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
+  }
+  
   // Thêm trẻ
-  document.getElementById('addChildForm').addEventListener('submit', function (e) {
+  document.getElementById('addChildForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const name = document.getElementById('childName').value;
-    const gender = document.getElementById('gender').value;
+    let gender = document.getElementById('gender').value;
     const birthDay = document.getElementById('birthDay').value;
 
+    if (!name || !gender || !birthDay) {
+      showAlert('Vui lòng điền đầy đủ thông tin!', 'error');
+      return;
+    }
+    
+    // Chuẩn hóa gender
+    gender = normalizeGender(gender);
+
     const childData = { childName: name, gender: gender, birthDay: birthDay };
+
+    console.log('Adding child with data:', childData);
+    showLoading();
+    
 
     fetch('/api/user/children/add', {
       method: 'POST',
@@ -93,62 +262,170 @@
       },
       body: JSON.stringify(childData)
     })
-            .then(res => res.json())
-            .then(data => {
-              showAlert("Đã thêm trẻ thành công!", "success");
-              fetchChildren();
-              document.getElementById('addChildForm').reset();
-            })
-            .catch(err => showAlert("Lỗi khi thêm trẻ.", "error"));
+
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Không thể thêm trẻ');
+      }
+      return res.json();
+    })
+    .then(data => {
+      showAlert('Thêm trẻ thành công!', 'success');
+      document.getElementById('addChildForm').reset();
+      fetchChildren(); // Refresh the list after adding
+    })
+    .catch(err => {
+      console.error('Error adding child:', err);
+      showAlert(err.message || 'Lỗi khi thêm trẻ. Vui lòng thử lại sau.', 'error');
+    })
+    .finally(() => hideLoading());
   });
+
+  // Xác nhận xóa
+  function confirmDelete(id) {
+    if (confirm("Bạn có chắc muốn xóa trẻ này không?")) {
+      deleteChild(id);
+    }
+  }
 
   // Xóa trẻ
   function deleteChild(id) {
-    if (!confirm("Bạn có chắc muốn xóa trẻ này không?")) return;
-    fetch(`/api/user/children/delete/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-            .then(res => res.json())
-            .then(data => {
-              showAlert(data.message || "Đã xóa trẻ.", "success");
-              fetchChildren();
-            })
-            .catch(err => showAlert("Lỗi khi xóa trẻ.", "error"));
-  }
-
-  // Cập nhật trẻ
-  function editChild(id) {
-    const newName = prompt("Tên mới:");
-    const newGender = prompt("Giới tính mới (MALE, FEMALE, OTHER):");
-    const newBirthDay = prompt("Ngày sinh mới (yyyy-mm-dd):");
-
-    if (!newName || !newGender || !newBirthDay) {
-      showAlert("Hủy cập nhật do thiếu thông tin.", "error");
+    if (!id) {
+      showAlert('ID trẻ không hợp lệ', 'error');
       return;
     }
+    
+    console.log('Deleting child with ID:', id);
+    showLoading();
+    
+    fetch(`/api/user/children/delete/${id}`, {
+      method: 'DELETE',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(res => {
+      console.log('Delete response status:', res.status);
+      
+      return res.text().then(text => {
+        console.log('Raw response:', text);
+        try {
+          // Parse JSON nếu có
+          return text ? JSON.parse(text) : { message: 'Đã xóa trẻ thành công!' };
+        } catch (e) {
+          console.error('Error parsing JSON:', e);
+          if (res.ok) {
+            return { message: 'Đã xóa trẻ thành công!' };
+          }
+          throw new Error('Lỗi khi xóa trẻ');
+        }
+      });
+    })
+    .then(data => {
+      showAlert(data.message || "Đã xóa trẻ thành công!");
+      fetchChildren();
+    })
+    .catch(err => {
+      console.error('Error deleting child:', err);
+      showAlert(err.message || 'Lỗi khi xóa trẻ. Vui lòng thử lại sau.', 'error');
+      // Vẫn load lại danh sách để đảm bảo dữ liệu đồng bộ
+      fetchChildren();
+    })
+    .finally(() => hideLoading());
+  }
 
-    const url = `/api/user/children/update/${id}?childName=${encodeURIComponent(newName)}&gender=${newGender}&birthDay=${newBirthDay}`;
+  // Mở modal chỉnh sửa
+  function openEditModal(id, name, gender, birthDay) {
+    console.log('Opening edit modal with data:', { id, name, gender, birthDay });
+    
+    document.getElementById('editChildId').value = id;
+    document.getElementById('editChildName').value = name;
+    document.getElementById('editGender').value = gender;
+    
+    // Format ngày tháng
+    try {
+      // Nếu birthDay đã là chuỗi YYYY-MM-DD thì dùng luôn
+      if (birthDay && birthDay.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        document.getElementById('editBirthDay').value = birthDay;
+      } 
+      // Nếu không thì chuyển đổi từ timestamp
+      else if (birthDay) {
+        const date = new Date(birthDay);
+        if (!isNaN(date.getTime())) {
+          document.getElementById('editBirthDay').value = date.toISOString().split('T')[0];
+        }
+      }
+    } catch (e) {
+      console.error('Error formatting birthDay for edit:', e);
+    }
+    
+    document.getElementById('editModal').classList.remove('hidden');
+  }
+
+  // Đóng modal chỉnh sửa
+  function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+  }
+
+  // Xử lý form chỉnh sửa
+  document.getElementById('editForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = document.getElementById('editChildId').value;
+    const name = document.getElementById('editChildName').value;
+    let gender = document.getElementById('editGender').value;
+    const birthDay = document.getElementById('editBirthDay').value;
+
+    if (!id || !name || !gender || !birthDay) {
+      showAlert('Vui lòng điền đầy đủ thông tin!', 'error');
+      return;
+    }
+    
+    // Chuẩn hóa gender
+    gender = normalizeGender(gender);
+
+    console.log('Updating child with data:', { id, name, gender, birthDay });
+    showLoading();
+    
+    // URL với tham số query thay vì body JSON
+    const url = `/api/user/children/update/${id}?childName=${encodeURIComponent(name)}&gender=${encodeURIComponent(gender)}&birthDay=${encodeURIComponent(birthDay)}`;
+    console.log('Request URL:', url);
+    
     fetch(url, {
       method: 'PUT',
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
-            .then(res => res.json())
-            .then(data => {
-              showAlert("Cập nhật thành công!", "success");
-              fetchChildren();
-            })
-            .catch(err => showAlert("Lỗi khi cập nhật.", "error"));
-  }
+    .then(res => {
+      console.log('Update response status:', res.status);
+      
+      return res.text().then(text => {
+        console.log('Raw response:', text);
+        try {
+          // Parse JSON nếu có
+          return text ? JSON.parse(text) : { message: 'Cập nhật thành công!' };
+        } catch (e) {
+          console.error('Error parsing JSON:', e);
+          if (res.ok) {
+            return { message: 'Cập nhật thành công!' };
+          }
+          throw new Error('Không thể cập nhật thông tin trẻ');
+        }
+      });
+    })
+    .then(data => {
+      showAlert(data.message || "Cập nhật thành công!");
+      closeEditModal();
+      fetchChildren();
+    })
+    .catch(err => {
+      console.error('Error updating child:', err);
+      showAlert(err.message || 'Lỗi khi cập nhật thông tin. Vui lòng thử lại sau.', 'error');
+    })
+    .finally(() => hideLoading());
+  });
 
-  // Hiển thị thông báo
-  function showAlert(message, type) {
-    const alertBox = document.getElementById('alert');
-    alertBox.textContent = message;
-    alertBox.className = `alert ${type}`;
-    alertBox.style.display = 'block';
-    setTimeout(() => alertBox.style.display = 'none', 4000);
-  }
 </script>
 </body>
 </html>

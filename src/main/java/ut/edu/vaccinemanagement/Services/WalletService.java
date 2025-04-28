@@ -121,12 +121,16 @@ public class WalletService {
         return paymentRepository.save(payment);
     }
 
-    // Thêm phương thức để lấy số dư ví của người dùng
+
+
+
     public BigDecimal getWalletBalance(Long userId) {
         Optional<Wallet> walletOpt = walletRepository.findByUser_UserId(userId);
         if (walletOpt.isPresent()) {
             return walletOpt.get().getAccountBalance();
         }
-        return null; // Trả về null nếu không tìm thấy ví
+
+        return null;
+
     }
 }

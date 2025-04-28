@@ -38,4 +38,16 @@ public class UserController {
     public String showProfile() {
         return "user/profile";
     }
+
+
+    @GetMapping("/feedback")
+    public String showFeedback() {
+        return "user/feedback";
+    }
+
+    @GetMapping("/symptom-report")
+    public String showSymptomReport() {
+        return "user/symptom-report";
+    }
+
 }

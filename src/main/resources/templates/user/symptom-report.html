@@ -1,10 +1,350 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Báo cáo triệu chứng sau tiêm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .report-card {
+            border-left: 4px solid #198754;
+            transition: all 0.3s ease;
+        }
+        .report-card:hover {
+            background-color: #f8f9fa;
+        }
+        .symptom-tag {
+            background-color: #e9ecef;
+            border-radius: 16px;
+            padding: 4px 12px;
+            margin: 2px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        .severity-mild { border-left-color: #198754; }
+        .severity-moderate { border-left-color: #ffc107; }
+        .severity-severe { border-left-color: #dc3545; }
+    </style>
 </head>
-<body>
+<body class="bg-light">
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Form báo cáo triệu chứng -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard2-pulse"></i> Báo cáo triệu chứng sau tiêm
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="symptomForm">
+                        <div class="mb-3">
+                            <label for="doctorId" class="form-label">Bác sĩ phụ trách (Nhập ID)</label>
+                            <input type="number" class="form-control" id="doctorId" required min="1" placeholder="Nhập ID của bác sĩ phụ trách">
+                            <small class="text-muted">Vui lòng nhập ID của bác sĩ phụ trách cuộc hẹn của bạn</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="symptoms" class="form-label">Triệu chứng gặp phải</label>
+                            <textarea class="form-control" id="symptoms" rows="3" required
+                                    placeholder="Mô tả chi tiết các triệu chứng bạn gặp phải..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mức độ nghiêm trọng</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="severity" id="mild" value="MILD" required>
+                                <label class="btn btn-outline-success" for="mild">Nhẹ</label>
+
+                                <input type="radio" class="btn-check" name="severity" id="moderate" value="MODERATE">
+                                <label class="btn btn-outline-warning" for="moderate">Trung bình</label>
+
+                                <input type="radio" class="btn-check" name="severity" id="severe" value="SEVERE">
+                                <label class="btn btn-outline-danger" for="severe">Nghiêm trọng</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="onsetDate" class="form-label">Thời điểm xuất hiện</label>
+                            <input type="datetime-local" class="form-control" id="onsetDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-send"></i> Gửi báo cáo
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lịch sử báo cáo -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i> Lịch sử báo cáo
+                    </h5>
+                    <button id="refreshBtn" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-arrow-clockwise"></i> Làm mới
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div id="reportList">
+                        <!-- Danh sách báo cáo sẽ được thêm vào đây -->
+                    </div>
+                    <!-- Trạng thái trống -->
+                    <div id="emptyState" class="text-center py-4 d-none">
+                        <i class="bi bi-clipboard-x" style="font-size: 2rem; color: #adb5bd;"></i>
+                        <p class="text-muted mt-2">Chưa có báo cáo nào</p>
+                    </div>
+                    <!-- Loading spinner -->
+                    <div id="loadingSpinner" class="text-center py-4 d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const token = localStorage.getItem('token');
+if (!token) {
+    window.location.href = '/login';
+}
+
+// Format thời gian
+function formatDateTime(dateString) {
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            return 'Ngày không hợp lệ';
+        }
+        
+        return date.toLocaleString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (err) {
+        console.error('Error formatting date:', err, dateString);
+        return 'Ngày không hợp lệ';
+    }
+}
+
+// Lấy tên mức độ nghiêm trọng
+function getSeverityName(severity) {
+    const severityMap = {
+        'MILD': 'Nhẹ',
+        'MODERATE': 'Trung bình',
+        'SEVERE': 'Nghiêm trọng'
+    };
+    return severityMap[severity] || severity;
+}
+
+// Lấy class CSS cho mức độ nghiêm trọng
+function getSeverityClass(severity) {
+    const severityMap = {
+        'MILD': 'severity-mild',
+        'MODERATE': 'severity-moderate',
+        'SEVERE': 'severity-severe'
+    };
+    return severityMap[severity] || '';
+}
+
+// Tải danh sách báo cáo
+function loadReports() {
+    const reportList = document.getElementById('reportList');
+    const emptyState = document.getElementById('emptyState');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+
+    reportList.innerHTML = '';
+    emptyState.classList.add('d-none');
+    loadingSpinner.classList.remove('d-none');
+
+    console.log('Đang tải danh sách báo cáo...');
+
+    fetch('/api/user/reaction-reports', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(res => {
+        console.log('Response status:', res.status);
+        
+        if (res.status === 204) {
+            throw new Error('no-content');
+        }
+        
+        // Kiểm tra content-type để đảm bảo là JSON
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return res.text().then(text => {
+                console.log('Raw response:', text);
+                try {
+                    // Parse JSON nếu có dữ liệu
+                    return text ? JSON.parse(text) : [];
+                } catch (e) {
+                    console.error('Error parsing JSON:', e, text);
+                    return [];
+                }
+            });
+        } else {
+            return [];
+        }
+    })
+    .then(reports => {
+        loadingSpinner.classList.add('d-none');
+        console.log('Parsed reports:', reports);
+        
+        if (!Array.isArray(reports) || reports.length === 0) {
+            emptyState.classList.remove('d-none');
+            return;
+        }
+        
+        reports.forEach((report, index) => {
+            console.log(`Report ${index}:`, report);
+            
+            try {
+                // Đảm bảo dữ liệu ngày tồn tại, nếu không dùng ngày hiện tại
+                const reportDate = report.reportDate ? new Date(report.reportDate) : new Date();
+                const onsetDate = report.onsetDate ? new Date(report.onsetDate) : new Date();
+                
+                // Format dates only if valid
+                const formattedReportDate = !isNaN(reportDate) ? formatDateTime(reportDate) : 'Không xác định';
+                const formattedOnsetDate = !isNaN(onsetDate) ? formatDateTime(onsetDate) : 'Không xác định';
+                
+                const severity = report.severity || 'MILD';
+                const symptoms = report.symptoms || 'Không có mô tả';
+                
+                const reportElement = document.createElement('div');
+                reportElement.className = `report-card p-3 border-bottom ${getSeverityClass(severity)}`;
+                
+                reportElement.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="mb-0">Báo cáo ngày ${formattedReportDate}</h6>
+                        <span class="symptom-tag">${getSeverityName(severity)}</span>
+                    </div>
+                    <p class="mb-2">${symptoms}</p>
+                    <small class="text-muted">
+                        <i class="bi bi-clock"></i> Thời điểm xuất hiện: ${formattedOnsetDate}
+                    </small>
+                `;
+                
+                reportList.appendChild(reportElement);
+            } catch (err) {
+                console.error('Error rendering report:', err, report);
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Error loading reports:', error);
+        loadingSpinner.classList.add('d-none');
+        
+        if (error.message === 'no-content') {
+            emptyState.classList.remove('d-none');
+        } else {
+            reportList.innerHTML = `
+                <div class="text-center text-danger p-4">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Có lỗi xảy ra khi tải báo cáo
+                </div>
+            `;
+        }
+    });
+}
+
+// Xử lý gửi báo cáo
+document.getElementById('symptomForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const doctorId = parseInt(document.getElementById('doctorId').value);
+    
+    if (isNaN(doctorId) || doctorId <= 0) {
+        alert('Vui lòng nhập ID bác sĩ hợp lệ!');
+        return;
+    }
+    
+    const report = {
+        symptoms: document.getElementById('symptoms').value,
+        severity: document.querySelector('input[name="severity"]:checked').value,
+        onsetDate: document.getElementById('onsetDate').value,
+        doctor: {
+            doctorId: doctorId
+        }
+    };
+
+    // Hiển thị thông báo đang xử lý
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang gửi...';
+
+    fetch('/api/user/report-symptoms', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(report)
+    })
+    .then(res => {
+        // Kiểm tra response status trước khi parse JSON
+        const contentType = res.headers.get('content-type');
+        
+        // Nếu status code là 2xx, coi như thành công ngay cả khi không có dữ liệu trả về
+        if (res.ok) {
+            if (contentType && contentType.includes('application/json')) {
+                return res.json();
+            } else {
+                // Trả về object giả nếu không có JSON
+                return { success: true, message: 'Báo cáo đã được gửi thành công!' };
+            }
+        }
+        
+        // Xử lý lỗi
+        if (contentType && contentType.includes('application/json')) {
+            return res.json().then(data => {
+                throw new Error(data.message || 'Có lỗi xảy ra khi gửi báo cáo.');
+            });
+        } else {
+            throw new Error('Có lỗi xảy ra khi gửi báo cáo.');
+        }
+    })
+    .then(data => {
+        alert(data.message || 'Báo cáo đã được gửi thành công!');
+        // Reset form
+        this.reset();
+        // Thêm độ trễ nhỏ trước khi tải lại danh sách để đảm bảo dữ liệu đã được lưu
+        setTimeout(loadReports, 500);
+    })
+    .catch(error => {
+        console.error('Lỗi:', error);
+        
+        // Kiểm tra lại database sau khi gặp lỗi (vì có thể dữ liệu vẫn được lưu)
+        setTimeout(function() {
+            // Tự động tải lại danh sách báo cáo để kiểm tra xem dữ liệu có được lưu không
+            loadReports();
+            
+            // Thông báo cho người dùng
+            alert('Đã có lỗi xảy ra, nhưng dữ liệu có thể đã được lưu. Vui lòng kiểm tra danh sách báo cáo.');
+        }, 1000);
+    })
+    .finally(() => {
+        // Khôi phục trạng thái nút submit
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+});
+
+// Xử lý nút làm mới
+document.getElementById('refreshBtn').addEventListener('click', loadReports);
+
+// Tải báo cáo khi trang được load
+document.addEventListener('DOMContentLoaded', loadReports);
+</script>
+
 
 </body>
 </html>

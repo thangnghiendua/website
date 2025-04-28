@@ -1,10 +1,235 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
 
-</body>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Thông báo</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .notification-item {
+        border-left: 4px solid #198754;
+        transition: all 0.3s ease;
+      }
+      .notification-item:hover {
+        background-color: #f8f9fa;
+      }
+      .notification-item.unread {
+        background-color: #e7f5ff;
+        border-left-color: #0d6efd;
+      }
+      .notification-time {
+        font-size: 0.85rem;
+        color: #6c757d;
+      }
+      .notification-icon {
+        font-size: 1.5rem;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: #e9ecef;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 40px 0;
+      }
+      .empty-state i {
+        font-size: 4rem;
+        color: #adb5bd;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card shadow-sm">
+            <div
+              class="card-header bg-white d-flex justify-content-between align-items-center py-3"
+            >
+              <h5 class="mb-0"><i class="bi bi-bell"></i> Thông báo của bạn</h5>
+              <button id="refreshBtn" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-arrow-clockwise"></i> Làm mới
+              </button>
+            </div>
+            <div class="card-body p-0">
+              <div id="notificationList" class="list-group list-group-flush">
+                <!-- Thông báo sẽ được thêm vào đây -->
+              </div>
+              <!-- Trạng thái trống -->
+              <div id="emptyState" class="empty-state d-none">
+                <i class="bi bi-bell-slash mb-3 d-block"></i>
+                <p class="text-muted">Chưa có thông báo nào</p>
+              </div>
+              <!-- Loading spinner -->
+              <div id="loadingSpinner" class="text-center py-4 d-none">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Đang tải...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "/login";
+      }
+
+      // Format thời gian
+      function formatTime(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+          return date.toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } else if (diffDays === 1) {
+          return "Hôm qua";
+        } else {
+          return date.toLocaleDateString("vi-VN");
+        }
+      }
+
+      // Hiển thị icon dựa vào loại thông báo
+      function getNotificationIcon(type) {
+        switch (type) {
+          case "Service":
+            return "bi-gear";
+          case "Appointment":
+            return "bi-calendar-check";
+          case "System":
+            return "bi-info-circle";
+          default:
+            return "bi-bell";
+        }
+      }
+
+      // Tải danh sách thông báo
+      function loadNotifications() {
+        const notificationList = document.getElementById("notificationList");
+        const emptyState = document.getElementById("emptyState");
+        const loadingSpinner = document.getElementById("loadingSpinner");
+
+        // Hiển thị loading
+        notificationList.innerHTML = "";
+        emptyState.classList.add("d-none");
+        loadingSpinner.classList.remove("d-none");
+
+        console.log("Fetching notifications...");
+        fetch("/api/user/notifications", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        })
+          .then((res) => {
+            console.log("Response status:", res.status);
+            if (!res.ok) {
+              return res.text().then((text) => {
+                console.error("Error response:", text);
+                throw new Error(`HTTP error! status: ${res.status}`);
+              });
+            }
+            return res.json().catch((err) => {
+              console.error("JSON parse error:", err);
+              throw new Error("Invalid JSON response");
+            });
+          })
+          .then((notifications) => {
+            console.log("Received notifications:", notifications);
+            loadingSpinner.classList.add("d-none");
+
+            if (!notifications || notifications.length === 0) {
+              emptyState.classList.remove("d-none");
+              return;
+            }
+
+            notifications.forEach((notification) => {
+              console.log("Processing notification:", notification);
+              const notificationElement = document.createElement("div");
+              notificationElement.className = `notification-item list-group-item list-group-item-action ${
+                notification.notificationStatus === "have_not_read_yet"
+                  ? "unread"
+                  : ""
+              }`;
+
+              // Format date safely
+              let formattedTime = "N/A";
+              try {
+                formattedTime = formatTime(notification.notificationDate);
+              } catch (err) {
+                console.error("Error formatting date:", err);
+              }
+
+              notificationElement.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="notification-icon me-3">
+                        <i class="bi ${getNotificationIcon(
+                          notification.notificationType
+                        )}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-1">${
+                              notification.message || "Không có nội dung"
+                            }</h6>
+                            <small class="notification-time">${formattedTime}</small>
+                        </div>
+                        ${
+                          notification.appointment
+                            ? `
+                            <p class="mb-1 small">
+                                <i class="bi bi-calendar-event"></i> 
+                                Cuộc hẹn: ${new Date(
+                                  notification.appointment.appointmentDate
+                                ).toLocaleString("vi-VN")}
+                            </p>
+                        `
+                            : ""
+                        }
+                    </div>
+                </div>
+            `;
+
+              notificationList.appendChild(notificationElement);
+            });
+          })
+          .catch((error) => {
+            console.error("Lỗi khi tải thông báo:", error);
+            loadingSpinner.classList.add("d-none");
+            notificationList.innerHTML = `
+            <div class="text-center text-danger p-4">
+                <i class="bi bi-exclamation-triangle"></i>
+                Có lỗi xảy ra khi tải thông báo: ${error.message}
+            </div>
+        `;
+          });
+      }
+
+      // Xử lý nút làm mới
+      document
+        .getElementById("refreshBtn")
+        .addEventListener("click", loadNotifications);
+
+      // Tải thông báo khi trang được load
+      document.addEventListener("DOMContentLoaded", loadNotifications);
+    </script>
+  </body>
 </html>

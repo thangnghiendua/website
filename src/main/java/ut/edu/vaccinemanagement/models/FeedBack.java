@@ -1,12 +1,18 @@
 package ut.edu.vaccinemanagement.models;
 import jakarta.persistence.*;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 @Entity
-@Table (name = "feed_backs")
+@Table(name = "feedbacks")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "feedBackId")
 public class FeedBack {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private long feedBackId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long feedBackId;
+
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -14,6 +20,9 @@ public class FeedBack {
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")
+
+    @JsonIdentityReference(alwaysAsId = true)
+
     private Doctor doctor;
 
     @Column(columnDefinition = "TEXT")

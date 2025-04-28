@@ -42,30 +42,41 @@ public class NotificationService {
     }
 
     public List<Notification> getUserNotifications(Long userId) {
-        return notificationRepository.findByUser_UserId(userId);
+
+        System.out.println("Fetching notifications for user ID: " + userId);
+        List<Notification> notifications = notificationRepository.findByUser_UserId(userId);
+        System.out.println("Found " + notifications.size() + " notifications");
+        return notifications;
     }
 
     public void sendAppointmentConfirmationNotification(Long userId) {
-        // Truy vấn thông tin các cuộc hẹn
-        List<Appointment> appointments = appointmentRepository.findByUser_UserIdAndAppointmentStatus(userId, AppointmentStatus.Pending);
+        System.out.println("Sending confirmation notification for user ID: " + userId);
+        
+        List<Appointment> appointments = appointmentRepository.findByUser_UserIdAndAppointmentStatus(userId, AppointmentStatus.Confirmed);
+        System.out.println("Found " + appointments.size() + " confirmed appointments");
 
-        // Kiểm tra nếu danh sách không rỗng
         if (!appointments.isEmpty()) {
-            // Lấy cuộc hẹn đầu tiên từ danh sách
             Appointment appointment = appointments.get(0);
+            System.out.println("Processing appointment ID: " + appointment.getAppointmentId());
 
-            // Gửi thông báo khi trạng thái cuộc hẹn là "Confirmed"
-            if (appointment.getAppointmentStatus() == AppointmentStatus.Confirmed) {
-                // Tạo và lưu thông báo
+            try {
                 Notification notification = new Notification();
-                notification.setUser(appointment.getUser());  // Truy cập thông tin user
+                notification.setUser(appointment.getUser());
+                notification.setAppointment(appointment);
                 notification.setMessage("Cuộc hẹn của bạn đã được xác nhận. Vui lòng kiểm tra thông tin chi tiết.");
+                notification.setNotificationStatus(NotificationStatus.have_not_read_yet);
+                notification.setNotificationType(NotificationType.Service);
                 notification.setNotificationDate(new Date());
-                notificationRepository.save(notification);
+                
+                Notification savedNotification = notificationRepository.save(notification);
+                System.out.println("Notification saved successfully with ID: " + savedNotification.getNotificationId());
+            } catch (Exception e) {
+                System.err.println("Error saving notification: " + e.getMessage());
+                e.printStackTrace();
             }
         } else {
-            // Nếu không có cuộc hẹn "Pending", có thể xử lý lỗi hoặc thông báo cho người dùng
-            System.out.println("Không tìm thấy cuộc hẹn đang chờ xác nhận.");
+            System.out.println("No confirmed appointments found for user ID: " + userId);
+
         }
     }
 }

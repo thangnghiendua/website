@@ -1,16 +1,25 @@
 package ut.edu.vaccinemanagement.models;
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.*;
 import java.util.Date;
 
 @Entity
-@Table (name = "Appointments")
+@Table(name = "Appointments", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "child_id", "vaccine_id", "appointment_date"})
+})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "appointmentId")
 public class Appointment {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private long appointmentId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+
+    @JsonIdentityReference(alwaysAsId = true)
+
     private User user;
 
     @ManyToOne
@@ -21,7 +30,9 @@ public class Appointment {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
-    @OneToOne
+
+    @ManyToOne
+
     @JoinColumn(name = "vaccine_id", nullable = false)
     private Vaccine vaccine;
 
@@ -38,6 +49,9 @@ public class Appointment {
     private AppointmentStatus appointmentStatus = AppointmentStatus.Pending;
 
     @OneToOne(mappedBy = "appointment")
+
+    @JsonBackReference
+
     private Notification notification;
 
     public Appointment(User user, Child child, Doctor doctor, Vaccine vaccine,Date appointmentDate, String appointmentAddress, String roomNumber, AppointmentStatus appointmentStatus) {

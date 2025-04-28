@@ -13,6 +13,9 @@ import ut.edu.vaccinemanagement.models.Doctor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+import java.util.Calendar;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -47,14 +50,22 @@ public class AppointmentService {
         Vaccine vaccine = vaccineRepository.findById(vaccineId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy vaccine"));
 
-        // Lấy bác sĩ có ID mặc định là 1
+
+
         Doctor doctor = doctorRepository.findById(1L)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bác sĩ với ID 1"));
 
         String appointmentAddress = "Phòng tiêm mặc định";
         String roomNumber = "Phòng 1";
 
-        Date appointmentDate = new Date();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 10);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date appointmentDate = calendar.getTime();
+
 
         Appointment appointment = new Appointment();
         appointment.setUser(user);
@@ -66,9 +77,9 @@ public class AppointmentService {
         appointment.setRoomNumber(roomNumber);
         appointment.setAppointmentStatus(AppointmentStatus.Pending);
 
-        Appointment savedAppointment = appointmentRepository.save(appointment);
 
-        return savedAppointment;
+        return appointmentRepository.save(appointment);
+
     }
 
 
@@ -82,6 +93,7 @@ public class AppointmentService {
 
         return appointmentRepository.save(appointment);
     }
+
 
     public Appointment cancelAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -113,8 +125,10 @@ public class AppointmentService {
         return appointmentRepository.findUpcomingAppointmentsByDoctorId(doctorId);
     }
 
-    public List<Appointment> getAllPendingAppointments() {
-        return appointmentRepository.findByAppointmentStatus(AppointmentStatus.Pending);
+
+    public List<Appointment> getAllPendingAppointments(Long doctorId) {
+        return appointmentRepository.findByDoctorDoctorIdAndAppointmentStatus(doctorId, AppointmentStatus.Pending);
+
     }
 
     public Appointment updateAppointmentIfPending(Long appointmentId, Date newDate, String newAddress, String newRoom, AppointmentStatus newStatus) throws Exception {

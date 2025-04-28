@@ -55,11 +55,13 @@ public class AuthensController {
 
             String role = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.joining(",")); // ví dụ: ROLE_Admin
+
+                    .collect(Collectors.joining(","));
 
             String token = jwtUtil.generateToken(userDetails.getUsername(), role);
 
-            return ResponseEntity.ok(new AuthResponse(token, role)); // Trả thêm role
+            return ResponseEntity.ok(new AuthResponse(token, role));
+
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
         }

@@ -262,4 +262,18 @@ public class UsersController {
         User updatedUser = userService.updateUserProfile(userId, dto);
         return ResponseEntity.ok(updatedUser);
     }
+
+
+    @GetMapping("/profile")
+    public ResponseEntity<User> getCurrentUserProfile() {
+        try {
+            Long userId = getCurrentUserId();
+            User user = userService.getUserById(userId);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+    }
+
 }

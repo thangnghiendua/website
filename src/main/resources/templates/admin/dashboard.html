@@ -4,21 +4,41 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <body class="bg-gray-100 min-h-screen">
 
 <!-- Header -->
-<header class="bg-blue-600 text-white p-4 shadow">
+
+<header class="bg-blue-600 text-white p-4 shadow flex justify-between items-center">
     <h1 class="text-2xl font-bold">Hệ thống quản lý tiêm chủng - Trang Admin</h1>
+    <div class="flex items-center space-x-4">
+        <span id="adminName">Admin</span>
+        <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600">Đăng xuất</button>
+    </div>
+
 </header>
 
 <div class="flex">
     <!-- Sidebar -->
     <aside class="w-64 bg-white shadow h-screen">
         <nav class="flex flex-col p-4 space-y-2">
-            <button onclick="showSection('dashboard')" class="hover:bg-blue-100 p-2 rounded">📊 Tổng quan</button>
-            <button onclick="showSection('users')" class="hover:bg-blue-100 p-2 rounded">👥 Quản lý người dùng</button>
-            <button onclick="showSection('vaccines')" class="hover:bg-blue-100 p-2 rounded">💉 Quản lý vaccine</button>
+
+            <button onclick="showSection('dashboard')" class="hover:bg-blue-100 p-2 rounded flex items-center">
+                <i class="fas fa-chart-line w-6"></i>
+                <span>Tổng quan</span>
+            </button>
+            <button onclick="showSection('users')" class="hover:bg-blue-100 p-2 rounded flex items-center">
+                <i class="fas fa-users w-6"></i>
+                <span>Quản lý người dùng</span>
+            </button>
+            <button onclick="showSection('vaccines')" class="hover:bg-blue-100 p-2 rounded flex items-center">
+                <i class="fas fa-syringe w-6"></i>
+                <span>Quản lý vaccine</span>
+            </button>
+
         </nav>
     </aside>
 
@@ -28,61 +48,566 @@
         <!-- Dashboard -->
         <section id="dashboard" class="space-y-4">
             <h2 class="text-xl font-semibold mb-4">📊 Tổng quan thống kê</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white p-6 rounded shadow">
-                    <h3 class="text-lg font-semibold">👶 Số trẻ theo giới tính</h3>
-                    <div id="genderStats">Đang tải...</div>
+                    <h3 class="text-lg font-semibold mb-2">👶 Số trẻ theo giới tính</h3>
+                    <div id="genderStats" class="space-y-2">Đang tải...</div>
                 </div>
                 <div class="bg-white p-6 rounded shadow">
-                    <h3 class="text-lg font-semibold">📈 Số trẻ theo độ tuổi</h3>
-                    <div id="ageStats">Đang tải...</div>
+                    <h3 class="text-lg font-semibold mb-2">📈 Số trẻ theo độ tuổi</h3>
+                    <div id="ageStats" class="space-y-2">Đang tải...</div>
                 </div>
                 <div class="bg-white p-6 rounded shadow">
-                    <h3 class="text-lg font-semibold">📅 Lịch hẹn theo tháng</h3>
-                    <div id="appointmentStats">Đang tải...</div>
+                    <h3 class="text-lg font-semibold mb-2">📅 Lịch hẹn theo tháng</h3>
+                    <div id="appointmentStats" class="space-y-2">Đang tải...</div>
+                </div>
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="text-lg font-semibold mb-2">📊 Tổng quan hệ thống</h3>
+                    <div id="dashboardSummary" class="space-y-2">Đang tải...</div>
+
                 </div>
             </div>
         </section>
 
         <!-- User management -->
         <section id="users" class="hidden space-y-4">
-            <h2 class="text-xl font-semibold mb-4">👥 Quản lý người dùng</h2>
-            <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ Thêm người dùng</button>
-            <div id="userTable" class="bg-white p-4 mt-4 rounded shadow">Đang tải danh sách...</div>
+
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">👥 Quản lý người dùng</h2>
+                <div class="flex space-x-4 items-center">
+                    <div class="flex items-center space-x-2">
+                        <label for="userRoleFilter" class="text-sm font-medium">Lọc theo role:</label>
+                        <select id="userRoleFilter" class="border rounded px-3 py-2">
+                            <option value="">Tất cả role</option>
+                            <option value="ROLE_USER">User</option>
+                            <option value="ROLE_ADMIN">Admin</option>
+                            <option value="ROLE_DOCTOR">Doctor</option>
+                        </select>
+                        <button onclick="loadUsers()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                    </div>
+                    <button onclick="showAddUserForm()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        <i class="fas fa-plus"></i> Thêm người dùng
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Add User Form -->
+            <div id="addUserForm" class="hidden bg-white p-4 rounded shadow mb-4">
+                <h3 class="text-lg font-semibold mb-4">Thêm người dùng mới</h3>
+                <form id="newUserForm" class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-1">Tên người dùng</label>
+                        <input type="text" name="userName" class="border rounded px-2 py-1 w-full" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Email</label>
+                        <input type="email" name="email" class="border rounded px-2 py-1 w-full" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Mật khẩu</label>
+                        <input type="password" name="password" class="border rounded px-2 py-1 w-full" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Role</label>
+                        <select name="userRole" class="border rounded px-2 py-1 w-full" required>
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Doctor">Doctor</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Giới tính</label>
+                        <select name="gender" class="border rounded px-2 py-1 w-full" required>
+                            <option value="Male">Nam</option>
+                            <option value="Female">Nữ</option>
+                            <option value="Other">Khác</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Ngày sinh</label>
+                        <input type="date" name="birthDate" class="border rounded px-2 py-1 w-full" required>
+                    </div>
+                    <div class="col-span-2 flex justify-end space-x-2">
+                        <button type="button" onclick="hideAddUserForm()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Hủy</button>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Thêm</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Users Table -->
+            <div class="bg-white p-4 rounded shadow overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="px-4 py-2 text-left">ID</th>
+                            <th class="px-4 py-2 text-left">Tên</th>
+                            <th class="px-4 py-2 text-left">Email</th>
+                            <th class="px-4 py-2 text-left">Role</th>
+                            <th class="px-4 py-2 text-left">Giới tính</th>
+                            <th class="px-4 py-2 text-left">Ngày sinh</th>
+                            <th class="px-4 py-2 text-left">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td colspan="7" class="px-4 py-2 text-center">Đang tải danh sách...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </section>
 
         <!-- Vaccine management -->
         <section id="vaccines" class="hidden space-y-4">
             <h2 class="text-xl font-semibold mb-4">💉 Quản lý vaccine</h2>
-            <div id="vaccineTable" class="bg-white p-4 mt-4 rounded shadow">Đang tải danh sách vaccine...</div>
+
+            <div class="bg-white p-4 rounded shadow overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="px-4 py-2 text-left">ID</th>
+                            <th class="px-4 py-2 text-left">Tên vaccine</th>
+                            <th class="px-4 py-2 text-left">Loại gói</th>
+                            <th class="px-4 py-2 text-left">Giá</th>
+                            <th class="px-4 py-2 text-left">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vaccineTableBody">
+                        <tr>
+                            <td colspan="5" class="px-4 py-2 text-center">Đang tải danh sách...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
     </main>
 </div>
 
 <script>
-    function showSection(id) {
-        document.querySelectorAll('main section').forEach(section => section.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-    }
 
-    // Ví dụ fetch dữ liệu nhanh (bạn thay thế bằng gọi API thực)
-    async function loadDashboardData() {
-        try {
-            const gender = await fetch('/api/admin/children-by-gender').then(res => res.json());
-            const age = await fetch('/api/admin/children-by-age-group').then(res => res.json());
-            const appointments = await fetch('/api/admin/monthly-appointments?year=2024').then(res => res.json());
-
-            document.getElementById("genderStats").textContent = JSON.stringify(gender, null, 2);
-            document.getElementById("ageStats").textContent = JSON.stringify(age, null, 2);
-            document.getElementById("appointmentStats").textContent = JSON.stringify(appointments, null, 2);
-        } catch (err) {
-            console.error("Lỗi khi load dashboard:", err);
+    // Kiểm tra đăng nhập
+    function checkAuth() {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        if (!token || !role.includes('ROLE_Admin')) {
+            window.location.href = '/login';
         }
     }
 
-    // Tự động tải dashboard khi vào trang
-    window.onload = loadDashboardData;
+    // Đăng xuất
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        window.location.href = '/login';
+    }
+
+    // Hiển thị/ẩn section
+    function showSection(id) {
+        document.querySelectorAll('main section').forEach(section => section.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        if (id === 'dashboard') {
+            loadDashboardData();
+        } else if (id === 'users') {
+            loadUsers();
+        } else if (id === 'vaccines') {
+            loadVaccines();
+        }
+    }
+
+    // Load dữ liệu dashboard
+    async function loadDashboardData() {
+        try {
+            const token = localStorage.getItem('token');
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+
+            const [dashboard, gender, age, appointments] = await Promise.all([
+                fetch('/api/admin/dashboard', { headers }).then(res => res.json()),
+                fetch('/api/admin/children-by-gender', { headers }).then(res => res.json()),
+                fetch('/api/admin/children-by-age-group', { headers }).then(res => res.json()),
+                fetch('/api/admin/monthly-appointments?year=2024', { headers }).then(res => res.json())
+            ]);
+
+            // Hiển thị tổng quan
+            document.getElementById('dashboardSummary').innerHTML = `
+                <div>Tổng số người dùng: ${dashboard.totalUsers || 0}</div>
+                <div>Tổng số trẻ: ${dashboard.totalChildren || 0}</div>
+                <div>Tổng số cuộc hẹn: ${dashboard.totalAppointments || 0}</div>
+            `;
+
+            // Hiển thị thống kê theo giới tính
+            document.getElementById('genderStats').innerHTML = Object.entries(gender)
+                .map(([key, value]) => `<div>${key}: ${value}</div>`)
+                .join('');
+
+            // Hiển thị thống kê theo độ tuổi
+            document.getElementById('ageStats').innerHTML = Object.entries(age)
+                .map(([key, value]) => `<div>${key}: ${value}</div>`)
+                .join('');
+
+            // Hiển thị thống kê lịch hẹn
+            document.getElementById('appointmentStats').innerHTML = appointments
+                .map(apt => `<div>${apt.month}: ${apt.count}</div>`)
+                .join('');
+        } catch (err) {
+            console.error('Lỗi khi tải dữ liệu dashboard:', err);
+        }
+    }
+
+    // Load danh sách người dùng
+    async function loadUsers() {
+        try {
+            const token = localStorage.getItem('token');
+            const roleFilter = document.getElementById('userRoleFilter').value;
+            let url = '/api/admin/users';
+            
+            // Chỉ thêm tham số role nếu đã chọn role cụ thể
+            if (roleFilter && roleFilter !== '') {
+                // Không cần chuyển đổi vì giá trị đã match với database
+                url = `/api/admin/users/role?userRole=${roleFilter}`;
+            }
+            
+            console.log('Fetching users with URL:', url); // Debug log
+            
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            // Log full response for debugging
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Server response:', errorText);
+                throw new Error(errorText || 'Không thể tải danh sách người dùng');
+            }
+            
+            const users = await response.json();
+            console.log('Received users:', users);
+            
+            window.usersData = users;
+            const tbody = document.getElementById('userTableBody');
+            
+            if (!Array.isArray(users) || users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-4 py-2 text-center">Không có người dùng nào</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = users.map(user => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-2">${user.userId}</td>
+                    <td class="px-4 py-2">${user.userName || 'N/A'}</td>
+                    <td class="px-4 py-2">${user.email || 'N/A'}</td>
+                    <td class="px-4 py-2">${user.userRole?.replace('ROLE_', '') || 'N/A'}</td>
+                    <td class="px-4 py-2">${user.gender || 'N/A'}</td>
+                    <td class="px-4 py-2">${user.birthDate ? new Date(user.birthDate).toLocaleDateString() : 'N/A'}</td>
+                    <td class="px-4 py-2">
+                        <button onclick="editUser(${user.userId})" class="text-blue-500 hover:text-blue-700 mr-2">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteUser(${user.userId})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            console.error('Lỗi khi tải danh sách người dùng:', err);
+            document.getElementById('userTableBody').innerHTML = `
+                <tr>
+                    <td colspan="7" class="px-4 py-2 text-center text-red-500">
+                        Lỗi khi tải danh sách: ${err.message}
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // Load danh sách vaccine
+    async function loadVaccines() {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/admin/vaccines', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const vaccines = await response.json();
+            const tbody = document.getElementById('vaccineTableBody');
+            
+            tbody.innerHTML = vaccines.map(vaccine => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-2">${vaccine.vaccineId}</td>
+                    <td class="px-4 py-2">${vaccine.vaccineName}</td>
+                    <td class="px-4 py-2">${vaccine.packageType}</td>
+                    <td class="px-4 py-2">${vaccine.price}</td>
+                    <td class="px-4 py-2">
+                        <button onclick="editVaccine(${vaccine.vaccineId})" class="text-blue-500 hover:text-blue-700">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            console.error('Lỗi khi tải danh sách vaccine:', err);
+        }
+    }
+
+    // Hiển thị form thêm người dùng
+    function showAddUserForm() {
+        document.getElementById('addUserForm').classList.remove('hidden');
+    }
+
+    // Ẩn form thêm người dùng
+    function hideAddUserForm() {
+        document.getElementById('addUserForm').classList.add('hidden');
+    }
+
+    // Xử lý thêm người dùng
+    document.getElementById('newUserForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('token');
+            const formData = new FormData(e.target);
+            
+            // Log raw form data
+            console.log('Raw form data:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+            
+            const userData = {
+                userName: formData.get('userName'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                userRole: formData.get('userRole'),
+                gender: formData.get('gender'),
+                birthDate: formData.get('birthDate')
+            };
+            
+            console.log('Sending user data:', userData);
+            
+            const response = await fetch('/api/admin/add/users', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Không thể thêm người dùng');
+            }
+            
+            const result = await response.json();
+            console.log('User added successfully:', result);
+            
+            hideAddUserForm();
+            e.target.reset(); // Reset form
+            loadUsers();
+            alert('Thêm người dùng thành công!');
+        } catch (err) {
+            console.error('Lỗi khi thêm người dùng:', err);
+            alert('Lỗi khi thêm người dùng: ' + err.message);
+        }
+    });
+
+    // Xử lý sửa người dùng
+    async function editUser(userId) {
+        try {
+            // Lấy thông tin người dùng từ danh sách đã lưu
+            const user = window.usersData.find(u => u.userId === userId);
+            if (!user) {
+                throw new Error('Không tìm thấy thông tin người dùng');
+            }
+
+            // Hiển thị form chỉnh sửa
+            const form = document.createElement('form');
+            form.innerHTML = `
+                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div class="bg-white p-6 rounded-lg w-96">
+                        <h3 class="text-lg font-semibold mb-4">Chỉnh sửa người dùng</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block mb-1">Tên người dùng</label>
+                                <input type="text" name="userName" value="${user.userName || ''}" class="border rounded px-2 py-1 w-full">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Email</label>
+                                <input type="email" name="email" value="${user.email || ''}" class="border rounded px-2 py-1 w-full">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Role</label>
+                                <select name="userRole" class="border rounded px-2 py-1 w-full">
+                                    <option value="User" ${user.userRole === 'ROLE_User' ? 'selected' : ''}>User</option>
+                                    <option value="Admin" ${user.userRole === 'ROLE_Admin' ? 'selected' : ''}>Admin</option>
+                                    <option value="Doctor" ${user.userRole === 'ROLE_Doctor' ? 'selected' : ''}>Doctor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block mb-1">Giới tính</label>
+                                <select name="gender" class="border rounded px-2 py-1 w-full">
+                                    <option value="Male" ${user.gender === 'Male' ? 'selected' : ''}>Nam</option>
+                                    <option value="Female" ${user.gender === 'Female' ? 'selected' : ''}>Nữ</option>
+                                    <option value="Other" ${user.gender === 'Other' ? 'selected' : ''}>Khác</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block mb-1">Ngày sinh</label>
+                                <input type="date" name="birthDate" value="${user.birthDate ? user.birthDate.split('T')[0] : ''}" class="border rounded px-2 py-1 w-full">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Mật khẩu mới (để trống nếu không đổi)</label>
+                                <input type="password" name="password" class="border rounded px-2 py-1 w-full">
+                            </div>
+                            <div class="flex justify-end space-x-2">
+                                <button type="button" onclick="this.closest('.fixed').remove()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Hủy</button>
+                                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Lưu</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(form);
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                try {
+                    const formData = new FormData(e.target);
+                    const updateData = new URLSearchParams();
+                    
+                    // Chỉ thêm các trường có giá trị và đã thay đổi
+                    if (formData.get('userName') && formData.get('userName') !== user.userName) 
+                        updateData.append('userName', formData.get('userName'));
+                    if (formData.get('email') && formData.get('email') !== user.email) 
+                        updateData.append('email', formData.get('email'));
+                    if (formData.get('userRole') && formData.get('userRole') !== user.userRole) 
+                        updateData.append('userRole', formData.get('userRole'));
+                    if (formData.get('gender') && formData.get('gender') !== user.gender) 
+                        updateData.append('gender', formData.get('gender'));
+                    if (formData.get('birthDate') && formData.get('birthDate') !== user.birthDate?.split('T')[0]) 
+                        updateData.append('birthDate', formData.get('birthDate'));
+                    if (formData.get('password')) 
+                        updateData.append('password', formData.get('password'));
+
+                    // Nếu không có trường nào thay đổi
+                    if (updateData.toString() === '') {
+                        alert('Không có thông tin nào được thay đổi');
+                        return;
+                    }
+                    
+                    console.log('Sending update data:', updateData.toString());
+                    
+                    const token = localStorage.getItem('token');
+                    const updateResponse = await fetch(`/api/admin/users/${userId}?${updateData.toString()}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    });
+                    
+                    if (!updateResponse.ok) {
+                        const errorData = await updateResponse.json();
+                        throw new Error(errorData.message || 'Không thể cập nhật người dùng');
+                    }
+                    
+                    const result = await updateResponse.json();
+                    console.log('User updated successfully:', result);
+                    
+                    form.remove();
+                    loadUsers();
+                    alert('Cập nhật người dùng thành công!');
+                } catch (err) {
+                    console.error('Lỗi khi cập nhật người dùng:', err);
+                    alert('Lỗi khi cập nhật người dùng: ' + err.message);
+                }
+            });
+        } catch (err) {
+            console.error('Lỗi khi lấy thông tin người dùng:', err);
+            alert('Lỗi khi lấy thông tin người dùng: ' + err.message);
+        }
+    }
+
+    // Xử lý xóa người dùng
+    async function deleteUser(userId) {
+        if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
+        
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Không thể xóa người dùng');
+            }
+            
+            loadUsers();
+            alert('Xóa người dùng thành công!');
+        } catch (err) {
+            console.error('Lỗi khi xóa người dùng:', err);
+            alert('Lỗi khi xóa người dùng: ' + err.message);
+        }
+    }
+
+    // Xử lý cập nhật vaccine
+    async function editVaccine(vaccineId) {
+        const newPrice = prompt('Nhập giá mới cho vaccine:');
+        if (!newPrice) return;
+        
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/admin/vaccines/${vaccineId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ price: newPrice })
+            });
+            
+            if (response.ok) {
+                loadVaccines();
+            } else {
+                alert('Có lỗi xảy ra khi cập nhật vaccine');
+            }
+        } catch (err) {
+            console.error('Lỗi khi cập nhật vaccine:', err);
+            alert('Có lỗi xảy ra khi cập nhật vaccine');
+        }
+    }
+
+    // Kiểm tra đăng nhập khi tải trang
+    checkAuth();
+    
+    // Load dữ liệu dashboard khi tải trang
+    loadDashboardData();
+
 </script>
 </body>
 </html>
