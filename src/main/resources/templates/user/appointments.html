@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Cuộc Hẹn Tiêm Chủng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body class="bg-gradient-to-r from-green-100 to-green-200 min-h-screen font-sans">
+
+<header class="bg-gradient-to-r from-green-600 to-green-800 text-white py-6 shadow-lg">
+  <h1 class="text-4xl text-center font-extrabold">Quản Lý Cuộc Hẹn Tiêm Chủng</h1>
+</header>
+
+<main class="max-w-4xl mx-auto mt-12 bg-white p-8 rounded-2xl shadow-xl">
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white p-4 rounded-lg shadow-lg">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+      <p class="mt-4 text-gray-700">Đang xử lý...</p>
+    </div>
+  </div>
+
+  <!-- Alert Message -->
+  <div id="alertMessage" class="hidden mb-4 p-4 rounded-lg"></div>
+
+  <!-- Phần Đặt Cuộc Hẹn -->
+  <section>
+    <h2 class="text-2xl font-semibold text-gray-800 mb-8 text-center">Đặt Cuộc Hẹn</h2>
+    <form id="bookForm" class="space-y-6">
+      <div class="flex flex-col">
+        <label for="childId" class="text-lg font-semibold text-gray-800">Chọn trẻ</label>
+        <select id="childId" class="p-2 border border-gray-400 rounded-lg" required>
+          <option value="">-- Chọn trẻ --</option>
+        </select>
+      </div>
+      <div class="flex flex-col">
+        <label for="vaccineId" class="text-lg font-semibold text-gray-800">Chọn vaccine</label>
+        <select id="vaccineId" class="p-2 border border-gray-400 rounded-lg" required>
+          <option value="">-- Chọn vaccine --</option>
+        </select>
+      </div>
+      <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
+        Đặt Cuộc Hẹn
+      </button>
+    </form>
+  </section>
+
+  <!-- Phần Lịch Sử Cuộc Hẹn -->
+  <section class="mt-12">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-8 text-center">Lịch Sử Cuộc Hẹn</h2>
+    <div id="appointmentsHistory" class="space-y-4">
+      <!-- Danh sách các cuộc hẹn sẽ được cập nhật ở đây -->
+    </div>
+  </section>
+</main>
+
+<script>
+  // Lấy token từ localStorage
+  const token = localStorage.getItem('token');
+
+  // Kiểm tra xem token có tồn tại không
+  if (!token) {
+    alert("Bạn cần phải đăng nhập để truy cập trang này!");
+    window.location.href = '/login';
+  }
+
+  // Khởi tạo Select2
+  $(document).ready(function() {
+    $('#childId, #vaccineId').select2({
+      width: '100%',
+      placeholder: 'Vui lòng chọn...'
+    });
+  });
+
+  // Hiển thị loading overlay
+  function showLoading() {
+    document.getElementById('loadingOverlay').classList.remove('hidden');
+  }
+
+  // Ẩn loading overlay
+  function hideLoading() {
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }
+
+  // Hiển thị thông báo
+  function showAlert(message, type = 'success') {
+    const alertDiv = document.getElementById('alertMessage');
+    alertDiv.textContent = message;
+    alertDiv.className = `mb-4 p-4 rounded-lg ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+    alertDiv.classList.remove('hidden');
+    setTimeout(() => alertDiv.classList.add('hidden'), 5000);
+  }
+
+  // Load danh sách trẻ và vaccine khi trang được tải
+  document.addEventListener("DOMContentLoaded", function() {
+    fetchChildren();
+    fetchVaccines();
+    fetchAppointmentsHistory();
+  });
+
+  // Lấy danh sách trẻ
+  function fetchChildren() {
+    showLoading();
+    fetch('/api/user/children', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      const select = document.getElementById('childId');
+      data.forEach(child => {
+        const option = document.createElement('option');
+        option.value = child.childId;
+        option.textContent = `${child.childName} (${new Date(child.birthDay).toLocaleDateString()})`;
+        select.appendChild(option);
+      });
+      hideLoading();
+    })
+    .catch(error => {
+      console.error('Error fetching children:', error);
+      showAlert('Không thể tải danh sách trẻ. Vui lòng thử lại sau.', 'error');
+      hideLoading();
+    });
+  }
+
+  // Lấy danh sách vaccine
+  function fetchVaccines() {
+    showLoading();
+    fetch('/api/user/vaccines', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      const select = document.getElementById('vaccineId');
+      data.forEach(vaccine => {
+        const option = document.createElement('option');
+        option.value = vaccine.vaccineId;
+        option.textContent = vaccine.vaccineName;
+        select.appendChild(option);
+      });
+      hideLoading();
+    })
+    .catch(error => {
+      console.error('Error fetching vaccines:', error);
+      showAlert('Không thể tải danh sách vaccine. Vui lòng thử lại sau.', 'error');
+      hideLoading();
+    });
+  }
+
+  // Lấy lịch sử cuộc hẹn
+  function fetchAppointmentsHistory() {
+    showLoading();
+    fetch('/api/user/history', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      const historyContainer = document.getElementById("appointmentsHistory");
+      historyContainer.innerHTML = '';
+
+      if (data.length === 0) {
+        historyContainer.innerHTML = '<p class="text-center text-gray-500">Không có cuộc hẹn nào.</p>';
+        hideLoading();
+        return;
+      }
+
+      data.forEach(appointment => {
+        const appointmentDate = new Date(appointment.appointmentDate);
+        const formattedDate = appointmentDate.toLocaleDateString('vi-VN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        const appointmentElement = document.createElement("div");
+        appointmentElement.classList.add("bg-white", "p-4", "rounded-lg", "shadow", "border", "border-gray-200");
+        appointmentElement.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div class="space-y-2">
+              <h3 class="text-xl font-semibold text-gray-800">ID Cuộc Hẹn: ${appointment.appointmentId}</h3>
+              <p class="text-gray-600">Ngày: ${formattedDate}</p>
+              <p class="text-gray-600">Trạng Thái: <span class="font-semibold ${getStatusColor(appointment.appointmentStatus)}">${getStatusText(appointment.appointmentStatus)}</span></p>
+              <p class="text-gray-600">Tên Trẻ: ${appointment.child ? appointment.child.childName : 'Chưa có trẻ'}</p>
+              <p class="text-gray-600">Tên Bác Sĩ: ${appointment.doctor ? appointment.doctor.doctorName : 'Chưa có bác sĩ'}</p>
+              <p class="text-gray-600">Tên Vaccine: ${appointment.vaccine ? appointment.vaccine.vaccineName : 'Chưa có vaccine'}</p>
+              <p class="text-gray-600">Địa Chỉ: ${appointment.appointmentAddress || 'Chưa có địa chỉ'}</p>
+              <p class="text-gray-600">Số Phòng: ${appointment.roomNumber || 'Chưa có số phòng'}</p>
+            </div>
+            <div class="flex space-x-2">
+              ${getActionButtons(appointment)}
+            </div>
+          </div>
+        `;
+        historyContainer.appendChild(appointmentElement);
+      });
+      hideLoading();
+    })
+    .catch(error => {
+      console.error('Error fetching appointments history:', error);
+      showAlert('Không thể tải lịch sử cuộc hẹn. Vui lòng thử lại sau.', 'error');
+      hideLoading();
+    });
+  }
+
+  // Lấy màu cho trạng thái
+  function getStatusColor(status) {
+    switch(status) {
+      case 'Pending': return 'text-yellow-600';
+      case 'Confirmed': return 'text-blue-600';
+      case 'Complete': return 'text-green-600';
+      case 'Canceled': return 'text-red-600';
+      default: return 'text-gray-600';
+    }
+  }
+
+  // Lấy text hiển thị cho trạng thái
+  function getStatusText(status) {
+    switch(status) {
+      case 'Pending': return 'Chờ xác nhận';
+      case 'Confirmed': return 'Đã xác nhận';
+      case 'Complete': return 'Đã hoàn thành';
+      case 'Canceled': return 'Đã hủy';
+      default: return status;
+    }
+  }
+
+  // Lấy các nút hành động dựa trên trạng thái
+  function getActionButtons(appointment) {
+    if (appointment.appointmentStatus === 'Canceled' || appointment.appointmentStatus === 'Complete') {
+      return '';
+    }
+
+    let buttons = '';
+    if (appointment.appointmentStatus === 'Pending') {
+      buttons += `<button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200" onclick="confirmAction('cancel', ${appointment.appointmentId})">Hủy</button>`;
+    }
+    if (appointment.appointmentStatus === 'Confirmed') {
+      buttons += `<button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200" onclick="confirmAction('complete', ${appointment.appointmentId})">Hoàn thành</button>`;
+    }
+    return buttons;
+  }
+
+  // Xác nhận hành động
+  function confirmAction(action, appointmentId) {
+    const actionText = action === 'cancel' ? 'hủy' : 'hoàn thành';
+    if (confirm(`Bạn có chắc chắn muốn ${actionText} cuộc hẹn này không?`)) {
+      if (action === 'cancel') {
+        cancelAppointment(appointmentId);
+      } else {
+        completeAppointment(appointmentId);
+      }
+    }
+  }
+
+  // Hủy cuộc hẹn
+  function cancelAppointment(appointmentId) {
+    showLoading();
+    fetch(`/api/user/cancel/${appointmentId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(error => {
+          throw new Error(error.message || 'Không thể hủy cuộc hẹn');
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      showAlert(data.message || "Cuộc hẹn đã được hủy thành công");
+      fetchAppointmentsHistory();
+    })
+    .catch(error => {
+      console.error('Error cancelling appointment:', error);
+      showAlert(error.message || 'Không thể hủy cuộc hẹn. Vui lòng thử lại sau.', 'error');
+    })
+    .finally(() => hideLoading());
+  }
+
+  // Hoàn thành cuộc hẹn
+  function completeAppointment(appointmentId) {
+    showLoading();
+    fetch(`/api/user/complete/${appointmentId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(error => {
+          throw new Error(error.message || 'Không thể hoàn thành cuộc hẹn');
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      showAlert(data.message || "Cuộc hẹn đã được hoàn thành");
+      fetchAppointmentsHistory();
+    })
+    .catch(error => {
+      console.error('Error completing appointment:', error);
+      showAlert(error.message || 'Không thể hoàn thành cuộc hẹn. Vui lòng thử lại sau.', 'error');
+    })
+    .finally(() => hideLoading());
+  }
+
+  // Xử lý form đặt cuộc hẹn
+  document.getElementById("bookForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const childId = parseInt(document.getElementById("childId").value);
+    const vaccineId = parseInt(document.getElementById("vaccineId").value);
+
+    if (!childId || !vaccineId) {
+      showAlert("Vui lòng chọn cả trẻ và vaccine!", 'error');
+      return;
+    }
+
+    showLoading();
+    fetch('/api/user/book', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        childId: childId,
+        vaccineId: vaccineId
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(text => {
+          try {
+            return Promise.reject(JSON.parse(text));
+          } catch (e) {
+            return Promise.reject(text);
+          }
+        });
+      }
+      // Chỉ cần kiểm tra response.ok, không cần parse JSON
+      return Promise.resolve();
+    })
+    .then(() => {
+      showAlert('Cuộc hẹn đã được đặt thành công!');
+      document.getElementById('bookForm').reset();
+      $('#childId, #vaccineId').val('').trigger('change');
+      fetchAppointmentsHistory();
+    })
+    .catch(error => {
+      console.error('Error booking appointment:', error);
+      const errorMessage = error.message || error || 'Đã có lỗi xảy ra khi đặt cuộc hẹn. Vui lòng thử lại sau.';
+      showAlert(errorMessage, 'error');
+    })
+    .finally(() => hideLoading());
+  });
+</script>
+
+</body>
+</html>

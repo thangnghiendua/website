@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<!-- Header -->
+<header class="bg-blue-600 text-white p-4 shadow flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Hệ thống quản lý tiêm chủng - Trang Bác sĩ</h1>
+    <div class="flex items-center space-x-4">
+        <span id="doctorName">Bác sĩ</span>
+        <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600">Đăng xuất</button>
+    </div>
+</header>
+
+<div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow h-screen">
+        <nav class="flex flex-col p-4 space-y-2">
+            <button onclick="showSection('appointments')" class="hover:bg-blue-100 p-2 rounded flex items-center">
+                <i class="fas fa-calendar-alt w-6"></i>
+                <span>Lịch hẹn</span>
+            </button>
+            <button onclick="showSection('feedbacks')" class="hover:bg-blue-100 p-2 rounded flex items-center">
+                <i class="fas fa-star w-6"></i>
+                <span>Đánh giá</span>
+            </button>
+            <button onclick="showSection('reports')" class="hover:bg-blue-100 p-2 rounded flex items-center">
+                <i class="fas fa-file-medical w-6"></i>
+                <span>Báo cáo triệu chứng</span>
+            </button>
+        </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6">
+        <!-- Appointments Section -->
+        <section id="appointments" class="space-y-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">📅 Quản lý lịch hẹn</h2>
+                <div class="flex space-x-2">
+                    <button onclick="loadUpcomingAppointments()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Lịch hẹn sắp tới
+                    </button>
+                    <button onclick="loadPendingAppointments()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                        Lịch hẹn chờ duyệt
+                    </button>
+                </div>
+            </div>
+
+            <!-- Appointments Table -->
+            <div class="bg-white p-4 rounded shadow overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="px-4 py-2 text-left">ID</th>
+                            <th class="px-4 py-2 text-left">Tên trẻ</th>
+                            <th class="px-4 py-2 text-left">Vaccine</th>
+                            <th class="px-4 py-2 text-left">Ngày hẹn</th>
+                            <th class="px-4 py-2 text-left">Địa điểm</th>
+                            <th class="px-4 py-2 text-left">Phòng</th>
+                            <th class="px-4 py-2 text-left">Trạng thái</th>
+                            <th class="px-4 py-2 text-left">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentsTableBody">
+                        <tr>
+                            <td colspan="8" class="px-4 py-2 text-center">Đang tải danh sách...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Feedbacks Section -->
+        <section id="feedbacks" class="hidden space-y-4">
+            <h2 class="text-xl font-semibold mb-4">⭐ Đánh giá từ người dùng</h2>
+            <div class="grid gap-4" id="feedbacksContainer">
+                <div class="text-center">Đang tải đánh giá...</div>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="hidden space-y-4">
+            <h2 class="text-xl font-semibold mb-4">📋 Báo cáo triệu chứng hôm nay</h2>
+            <div class="grid gap-4" id="reportsContainer">
+                <div class="text-center">Đang tải báo cáo...</div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Update Appointment Modal -->
+<div id="updateAppointmentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg w-96">
+        <h3 class="text-lg font-semibold mb-4">Cập nhật lịch hẹn</h3>
+        <form id="updateAppointmentForm" class="space-y-4">
+            <input type="hidden" id="appointmentId">
+            <div>
+                <label class="block mb-1">Ngày hẹn mới</label>
+                <input type="datetime-local" id="newDate" class="border rounded px-2 py-1 w-full" required>
+            </div>
+            <div>
+                <label class="block mb-1">Địa điểm mới</label>
+                <input type="text" id="newAddress" class="border rounded px-2 py-1 w-full" required>
+            </div>
+            <div>
+                <label class="block mb-1">Phòng mới</label>
+                <input type="text" id="newRoom" class="border rounded px-2 py-1 w-full" required>
+            </div>
+            <div>
+                <label class="block mb-1">Trạng thái mới</label>
+                <select id="newStatus" class="border rounded px-2 py-1 w-full" required>
+                    <option value="Confirmed">Xác nhận</option> 
+                    <option value="REJECTED">Từ chối</option>
+                </select>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button type="button" onclick="closeUpdateModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Hủy</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Cập nhật</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Doctor Feedback Modal -->
+<div id="addFeedbackModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg w-96">
+        <h3 class="text-lg font-semibold mb-4">Thêm phản hồi cho báo cáo</h3>
+        <form id="addFeedbackForm" class="space-y-4">
+            <input type="hidden" id="reportId">
+            <div>
+                <label class="block mb-1">Phản hồi của bác sĩ</label>
+                <textarea id="doctorFeedback" class="border rounded px-2 py-1 w-full h-32" required></textarea>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button type="button" onclick="closeAddFeedbackModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Hủy</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Gửi phản hồi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Doctor ID Input Modal -->
+<div id="doctorIdModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg w-96">
+        <h3 class="text-lg font-semibold mb-4">Nhập ID Bác sĩ</h3>
+        <form id="doctorIdForm" class="space-y-4">
+            <div>
+                <label class="block mb-1">ID Bác sĩ</label>
+                <input type="number" id="inputDoctorId" class="border rounded px-2 py-1 w-full" required>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Xác nhận</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentDoctorId;
+
+    // Kiểm tra và yêu cầu nhập doctor ID
+    function checkDoctorId() {
+        const doctorId = localStorage.getItem('doctorId');
+        if (!doctorId) {
+            document.getElementById('doctorIdModal').classList.remove('hidden');
+        } else {
+            currentDoctorId = doctorId;
+            loadUpcomingAppointments();
+        }
+    }
+
+    // Xử lý form nhập doctor ID
+    document.getElementById('doctorIdForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const doctorId = document.getElementById('inputDoctorId').value;
+        localStorage.setItem('doctorId', doctorId);
+        currentDoctorId = doctorId;
+        document.getElementById('doctorIdModal').classList.add('hidden');
+        loadUpcomingAppointments();
+    });
+
+    // Kiểm tra đăng nhập
+    function checkAuth() {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        if (!token || !role.includes('ROLE_Doctor')) {
+            window.location.href = '/login';
+        }
+        document.getElementById('doctorName').textContent = localStorage.getItem('userName') || 'Bác sĩ';
+        checkDoctorId(); // Thêm kiểm tra doctor ID
+    }
+
+    // Đăng xuất
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('doctorId'); // Thêm xóa doctorId
+        window.location.href = '/login';
+    }
+
+    // Hiển thị/ẩn section
+    function showSection(id) {
+        document.querySelectorAll('main section').forEach(section => section.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        
+        if (id === 'appointments') {
+            loadUpcomingAppointments();
+        } else if (id === 'feedbacks') {
+            loadFeedbacks();
+        } else if (id === 'reports') {
+            loadReports();
+        }
+    }
+
+    // Load lịch hẹn sắp tới
+    async function loadUpcomingAppointments() {
+        try {
+            if (!currentDoctorId) {
+                showError('appointmentsTableBody', 'Vui lòng nhập ID bác sĩ');
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            console.log('Fetching appointments for doctor:', currentDoctorId);
+            
+            const response = await fetch(`/api/doctor/${currentDoctorId}/upcoming-appointments`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            console.log('Response status:', response.status);
+            const responseText = await response.text();
+            console.log('Raw response:', responseText);
+            
+            if (!response.ok) {
+                throw new Error(responseText || 'Không thể tải lịch hẹn sắp tới');
+            }
+
+            const appointments = JSON.parse(responseText);
+            console.log('Parsed appointments data:', appointments);
+
+            if (!Array.isArray(appointments)) {
+                console.error('Appointments is not an array:', appointments);
+                throw new Error('Dữ liệu không hợp lệ');
+            }
+
+            displayAppointments(appointments);
+        } catch (err) {
+            console.error('Lỗi khi tải lịch hẹn sắp tới:', err);
+            showError('appointmentsTableBody', err.message);
+        }
+    }
+
+    // Load lịch hẹn đang chờ
+    async function loadPendingAppointments() {
+        try {
+            if (!currentDoctorId) {
+                showError('appointmentsTableBody', 'Vui lòng nhập ID bác sĩ');
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/doctor/appointments/pending`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Raw pending appointments data:', data);
+
+            // Chuẩn hóa dữ liệu thành mảng
+            let appointments = Array.isArray(data) ? data : 
+                             data?.content ? data.content :
+                             data?.appointments ? data.appointments : 
+                             [data];
+
+            // Chuẩn hóa từng appointment
+            appointments = appointments.map(apt => {
+                // Lấy appointment từ cấu trúc lồng nhau nếu có
+                const appointment = apt.appointment || apt;
+                
+                return {
+                    appointmentId: appointment.id || appointment.appointmentId,
+                    child: {
+                        childName: appointment.child?.childName || appointment.child?.name || 'N/A'
+                    },
+                    vaccine: {
+                        vaccineName: appointment.vaccine?.vaccineName || appointment.vaccine?.name || 'N/A'
+                    },
+                    appointmentDate: appointment.appointmentDate || appointment.date,
+                    appointmentAddress: appointment.appointmentAddress || appointment.address || 'N/A',
+                    roomNumber: appointment.roomNumber || appointment.room || 'N/A',
+                    appointmentStatus: appointment.appointmentStatus || appointment.status || 'PENDING'
+                };
+            });
+
+            console.log('Normalized appointments:', appointments);
+            displayAppointments(appointments);
+        } catch (error) {
+            console.error('Error in loadPendingAppointments:', error);
+            showError('appointmentsTableBody', `Lỗi: ${error.message}`);
+        }
+    }
+
+    // Hiển thị danh sách lịch hẹn
+    function displayAppointments(appointments) {
+        console.log("Raw appointments data:", appointments);
+        
+        const tableBody = document.getElementById('appointmentsTableBody');
+        tableBody.innerHTML = '';
+
+        // Chuẩn hóa dữ liệu thành mảng
+        let appointmentArray = Array.isArray(appointments) ? appointments : 
+                             appointments?.content ? appointments.content :
+                             appointments?.appointments ? appointments.appointments : [];
+
+        if (!appointmentArray || appointmentArray.length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = '<td colspan="8" class="text-center">Không có lịch hẹn nào</td>';
+            tableBody.appendChild(emptyRow);
+            return;
+        }
+
+        appointmentArray.forEach(apt => {
+            console.log("Processing appointment:", apt);
+            
+            // Lấy appointment từ cấu trúc lồng nhau nếu có
+            const appointment = apt.appointment || apt;
+            
+            // Format date
+            let formattedDate = 'N/A';
+            if (appointment?.appointmentDate) {
+                const date = new Date(appointment.appointmentDate);
+                if (!isNaN(date.getTime())) {
+                    formattedDate = date.toLocaleString('vi-VN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            }
+
+            // Xử lý trạng thái
+            const status = appointment?.appointmentStatus || 'PENDING';
+            const statusBadge = getStatusBadge(status);
+
+            // Create table row
+            const row = document.createElement('tr');
+            row.className = 'border-b hover:bg-gray-50';
+            row.innerHTML = `
+                <td class="px-4 py-2">${appointment?.appointmentId || appointment?.id || 'N/A'}</td>
+                <td class="px-4 py-2">${appointment?.child?.childName || 'N/A'}</td>
+                <td class="px-4 py-2">${appointment?.vaccine?.vaccineName || 'N/A'}</td>
+                <td class="px-4 py-2">${formattedDate}</td>
+                <td class="px-4 py-2">${appointment?.appointmentAddress || 'N/A'}</td>
+                <td class="px-4 py-2">${appointment?.roomNumber || 'N/A'}</td>
+                <td class="px-4 py-2">${statusBadge}</td>
+                <td class="px-4 py-2">
+                    ${status === 'PENDING' ? `
+                        <button onclick='showUpdateModal(${JSON.stringify({
+                            appointmentId: appointment.appointmentId || appointment.id,
+                            appointmentDate: appointment.appointmentDate,
+                            appointmentAddress: appointment.appointmentAddress,
+                            roomNumber: appointment.roomNumber,
+                            appointmentStatus: status
+                        })})' class="text-blue-500 hover:text-blue-700 mr-2">
+                            <i class="fas fa-edit"></i> Chỉnh sửa
+                        </button>
+                    ` : ''}
+                    ${status === 'CONFIRMED' ? `
+                        <button onclick="createPayment(${appointment.appointmentId || appointment.id})" 
+                                class="text-green-500 hover:text-green-700">
+                            <i class="fas fa-dollar-sign"></i> Thanh toán
+                        </button>
+                    ` : ''}
+                </td>
+            `;
+            
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Hiển thị badge trạng thái
+    function getStatusBadge(status) {
+        const badges = {
+            'PENDING': '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Chờ duyệt</span>',
+            'CONFIRMED': '<span class="bg-green-100 text-green-800 px-2 py-1 rounded">Đã xác nhận</span>',
+            'REJECTED': '<span class="bg-red-100 text-red-800 px-2 py-1 rounded">Đã từ chối</span>',
+            'COMPLETED': '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded">Hoàn thành</span>',
+            'CANCELLED': '<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded">Đã hủy</span>'
+        };
+        return badges[status] || status;
+    }
+
+    // Hiển thị modal cập nhật lịch hẹn
+    function showUpdateModal(appointment) {
+        console.log('Opening update modal for appointment:', appointment);
+        try {
+            document.getElementById('appointmentId').value = appointment.appointmentId;
+            
+            // Format date properly
+            let dateValue = '';
+            if (appointment.appointmentDate) {
+                const date = new Date(appointment.appointmentDate);
+                if (!isNaN(date)) {
+                    dateValue = date.toISOString().slice(0, 16);
+                }
+            }
+            document.getElementById('newDate').value = dateValue;
+            
+            document.getElementById('newAddress').value = appointment.appointmentAddress || '';
+            document.getElementById('newRoom').value = appointment.roomNumber || '';
+            document.getElementById('newStatus').value = appointment.appointmentStatus || 'PENDING';
+            document.getElementById('updateAppointmentModal').classList.remove('hidden');
+        } catch (err) {
+            console.error('Error showing update modal:', err);
+            alert('Lỗi khi hiển thị form cập nhật: ' + err.message);
+        }
+    }
+
+    // Đóng modal cập nhật lịch hẹn
+    function closeUpdateModal() {
+        document.getElementById('updateAppointmentModal').classList.add('hidden');
+    }
+
+    // Xử lý cập nhật lịch hẹn
+    document.getElementById('updateAppointmentForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('token');
+            const appointmentId = document.getElementById('appointmentId').value;
+            const newDate = new Date(document.getElementById('newDate').value).toISOString();
+            const newAddress = document.getElementById('newAddress').value;
+            const newRoom = document.getElementById('newRoom').value;
+            const newStatus = document.getElementById('newStatus').value;
+
+            const response = await fetch(`/api/doctor/appointments/${appointmentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    newDate,
+                    newAddress,
+                    newRoom,
+                    newStatus
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Không thể cập nhật lịch hẹn');
+            }
+
+            closeUpdateModal();
+            loadPendingAppointments();
+            alert('Cập nhật lịch hẹn thành công!');
+        } catch (err) {
+            console.error('Lỗi khi cập nhật lịch hẹn:', err);
+            alert('Lỗi khi cập nhật lịch hẹn: ' + err.message);
+        }
+    });
+
+    // Tạo payment cho lịch hẹn
+    async function createPayment(appointmentId) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/doctor/payment/create', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    appointmentId: appointmentId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Không thể tạo payment');
+            }
+
+            alert('Tạo payment thành công!');
+            loadUpcomingAppointments();
+        } catch (err) {
+            console.error('Lỗi khi tạo payment:', err);
+            alert('Lỗi khi tạo payment: ' + err.message);
+        }
+    }
+
+    // Load đánh giá
+    async function loadFeedbacks() {
+        try {
+            if (!currentDoctorId) {
+                document.getElementById('feedbacksContainer').innerHTML = '<div class="text-center text-red-500">Vui lòng nhập ID bác sĩ</div>';
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            console.log('Fetching feedbacks for doctor:', currentDoctorId);
+            
+            const response = await fetch(`/api/doctor/${currentDoctorId}/feedbacks`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            console.log('Feedback response status:', response.status);
+            const responseText = await response.text();
+            console.log('Raw feedback response:', responseText);
+            
+            if (!response.ok) {
+                throw new Error(responseText || 'Không thể tải đánh giá');
+            }
+
+            const feedbacks = JSON.parse(responseText);
+            console.log('Parsed feedbacks:', feedbacks);
+            
+            const container = document.getElementById('feedbacksContainer');
+            
+            if (!Array.isArray(feedbacks) || feedbacks.length === 0) {
+                container.innerHTML = '<div class="text-center">Chưa có đánh giá nào</div>';
+                return;
+            }
+            
+            container.innerHTML = feedbacks.map(feedback => {
+                console.log('Processing feedback:', feedback);
+                
+                // Format date
+                let dateStr = 'N/A';
+                try {
+                    if (feedback.feedbackDate) {
+                        const date = new Date(feedback.feedbackDate);
+                        if (!isNaN(date)) {
+                            dateStr = date.toLocaleString('vi-VN');
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error formatting feedback date:', err);
+                }
+
+                return `
+                    <div class="bg-white p-4 rounded shadow">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-semibold">${feedback.user?.fullName || 'Ẩn danh'}</div>
+                                <div class="text-sm text-gray-500">${dateStr}</div>
+                            </div>
+                            <div class="text-yellow-400">
+                                ${'★'.repeat(feedback.rating || 0)}${'☆'.repeat(5-(feedback.rating || 0))}
+                            </div>
+                        </div>
+                        <p class="mt-2">${feedback.comment || 'Không có nội dung'}</p>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            console.error('Lỗi khi tải đánh giá:', err);
+            document.getElementById('feedbacksContainer').innerHTML = `<div class="text-center text-red-500">${err.message}</div>`;
+        }
+    }
+
+    // Load báo cáo triệu chứng
+    async function loadReports() {
+        try {
+            if (!currentDoctorId) {
+                document.getElementById('reportsContainer').innerHTML = '<div class="text-center text-red-500">Vui lòng nhập ID bác sĩ</div>';
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            console.log('Fetching reports for doctor:', currentDoctorId);
+            
+            const response = await fetch(`/api/doctor/${currentDoctorId}/reaction-reports/today`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            console.log('Reports response status:', response.status);
+            const responseText = await response.text();
+            console.log('Raw reports response:', responseText);
+            
+            if (!response.ok) {
+                throw new Error(responseText || 'Không thể tải báo cáo');
+            }
+
+            const reports = JSON.parse(responseText);
+            console.log('Parsed reports:', reports);
+            
+            const container = document.getElementById('reportsContainer');
+            
+            if (!Array.isArray(reports) || reports.length === 0) {
+                container.innerHTML = '<div class="text-center">Chưa có báo cáo nào hôm nay</div>';
+                return;
+            }
+            
+            container.innerHTML = reports.map(report => {
+                console.log('Processing report:', report);
+                
+                // Format date
+                let dateStr = 'N/A';
+                try {
+                    if (report.reportDate) {
+                        const date = new Date(report.reportDate);
+                        if (!isNaN(date)) {
+                            dateStr = date.toLocaleString('vi-VN');
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error formatting report date:', err);
+                }
+
+                return `
+                    <div class="bg-white p-4 rounded shadow">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-semibold">${report.user?.fullName || 'Ẩn danh'}</div>
+                                <div class="text-sm text-gray-500">${dateStr}</div>
+                            </div>
+                            ${!report.doctorFeedback ? `
+                                <button onclick="showAddFeedbackModal(${report.reactionReportId})" 
+                                        class="text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-comment-medical"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                        <div class="mt-2">
+                            <p class="font-medium">Triệu chứng:</p>
+                            <p>${report.symptoms || 'Không có triệu chứng'}</p>
+                        </div>
+                        ${report.doctorFeedback ? `
+                            <div class="mt-2 bg-blue-50 p-2 rounded">
+                                <p class="font-medium">Phản hồi của bác sĩ:</p>
+                                <p>${report.doctorFeedback}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            console.error('Lỗi khi tải báo cáo:', err);
+            document.getElementById('reportsContainer').innerHTML = `<div class="text-center text-red-500">${err.message}</div>`;
+        }
+    }
+
+    // Hiển thị modal thêm phản hồi
+    function showAddFeedbackModal(reportId) {
+        document.getElementById('reportId').value = reportId;
+        document.getElementById('doctorFeedback').value = '';
+        document.getElementById('addFeedbackModal').classList.remove('hidden');
+    }
+
+    // Đóng modal thêm phản hồi
+    function closeAddFeedbackModal() {
+        document.getElementById('addFeedbackModal').classList.add('hidden');
+    }
+
+    // Xử lý thêm phản hồi
+    document.getElementById('addFeedbackForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('token');
+            const reportId = document.getElementById('reportId').value;
+            const feedback = document.getElementById('doctorFeedback').value;
+
+            const response = await fetch(`/api/doctor/${currentDoctorId}/reaction-reports/${reportId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(feedback)
+            });
+
+            if (!response.ok) {
+                throw new Error('Không thể thêm phản hồi');
+            }
+
+            closeAddFeedbackModal();
+            loadReports();
+            alert('Thêm phản hồi thành công!');
+        } catch (err) {
+            console.error('Lỗi khi thêm phản hồi:', err);
+            alert('Lỗi khi thêm phản hồi: ' + err.message);
+        }
+    });
+
+    // Hiển thị lỗi
+    function showError(containerId, message) {
+        document.getElementById(containerId).innerHTML = `
+            <tr>
+                <td colspan="8" class="px-4 py-2 text-center text-red-500">${message}</td>
+            </tr>
+        `;
+    }
+
+    // Kiểm tra đăng nhập khi tải trang
+    checkAuth();
+    
+    // Load lịch hẹn sắp tới khi tải trang
+    loadUpcomingAppointments();
+</script>
+</body>
+</html>
