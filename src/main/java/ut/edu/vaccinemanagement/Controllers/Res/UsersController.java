@@ -263,6 +263,7 @@ public class UsersController {
         return ResponseEntity.ok(updatedUser);
     }
 
+
     @GetMapping("/profile")
     public ResponseEntity<User> getCurrentUserProfile() {
         try {
@@ -274,4 +275,5 @@ public class UsersController {
                     .body(null);
         }
     }
+
 }

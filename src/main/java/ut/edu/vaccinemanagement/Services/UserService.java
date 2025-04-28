@@ -90,7 +90,9 @@ public class UserService implements UserDetailsService {
     }
 
     public User addUser(User user) {
+
         user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
+
         return userRepository.save(user);
     }
 
@@ -133,24 +135,32 @@ public class UserService implements UserDetailsService {
 
     public User updateUserProfile(Long userId, UpdateUserProfileDTO dto) {
         return userRepository.findById(userId).map(user -> {
+
             if (dto.getUserName() != null && !dto.getUserName().trim().isEmpty()) {
                 user.setFullName(dto.getUserName().trim());
+
             }
 
             if (dto.getGender() != null) {
                 try {
+
                     user.setGender(Gender.valueOf(dto.getGender()));
+
                 } catch (IllegalArgumentException e) {
                     throw new RuntimeException("Giới tính không hợp lệ: " + dto.getGender());
                 }
             }
 
+
             if (dto.getBirthDate() != null && !dto.getBirthDate().trim().isEmpty()) {
+
                 try {
                     Date date = java.sql.Date.valueOf(dto.getBirthDate());
                     user.setBirthDate(date);
                 } catch (Exception e) {
+
                     throw new RuntimeException("Ngày sinh không hợp lệ. Vui lòng sử dụng định dạng YYYY-MM-DD");
+
                 }
             }
 

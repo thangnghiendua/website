@@ -122,11 +122,15 @@ public class WalletService {
     }
 
 
+
+
     public BigDecimal getWalletBalance(Long userId) {
         Optional<Wallet> walletOpt = walletRepository.findByUser_UserId(userId);
         if (walletOpt.isPresent()) {
             return walletOpt.get().getAccountBalance();
         }
+
         return null;
+
     }
 }

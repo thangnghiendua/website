@@ -30,12 +30,14 @@ public class ChildService {
                 child.setChildName(childName);
             }
             if (gender != null) {
+
                 try {
                     String normalizedGender = gender.substring(0, 1).toUpperCase() + gender.substring(1).toLowerCase();
                     child.setGender(Gender.valueOf(normalizedGender));
                 } catch (IllegalArgumentException e) {
                     throw new RuntimeException("Giới tính không hợp lệ: " + gender);
                 }
+
             }
             if (birthDay != null) {
                 try {

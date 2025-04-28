@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý Cuộc Hẹn Tiêm Chủng</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 </head>
 <body class="bg-gradient-to-r from-green-100 to-green-200 min-h-screen font-sans">
 
@@ -16,6 +18,7 @@
 </header>
 
 <main class="max-w-4xl mx-auto mt-12 bg-white p-8 rounded-2xl shadow-xl">
+
   <!-- Loading Overlay -->
   <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
     <div class="bg-white p-4 rounded-lg shadow-lg">
@@ -27,11 +30,13 @@
   <!-- Alert Message -->
   <div id="alertMessage" class="hidden mb-4 p-4 rounded-lg"></div>
 
+
   <!-- Phần Đặt Cuộc Hẹn -->
   <section>
     <h2 class="text-2xl font-semibold text-gray-800 mb-8 text-center">Đặt Cuộc Hẹn</h2>
     <form id="bookForm" class="space-y-6">
       <div class="flex flex-col">
+
         <label for="childId" class="text-lg font-semibold text-gray-800">Chọn trẻ</label>
         <select id="childId" class="p-2 border border-gray-400 rounded-lg" required>
           <option value="">-- Chọn trẻ --</option>
@@ -46,13 +51,16 @@
       <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
         Đặt Cuộc Hẹn
       </button>
+
     </form>
   </section>
 
   <!-- Phần Lịch Sử Cuộc Hẹn -->
   <section class="mt-12">
     <h2 class="text-2xl font-semibold text-gray-800 mb-8 text-center">Lịch Sử Cuộc Hẹn</h2>
+
     <div id="appointmentsHistory" class="space-y-4">
+
       <!-- Danh sách các cuộc hẹn sẽ được cập nhật ở đây -->
     </div>
   </section>
@@ -60,11 +68,14 @@
 
 <script>
   // Lấy token từ localStorage
+
   const token = localStorage.getItem('token');
+
 
   // Kiểm tra xem token có tồn tại không
   if (!token) {
     alert("Bạn cần phải đăng nhập để truy cập trang này!");
+
     window.location.href = '/login';
   }
 
@@ -160,11 +171,13 @@
   function fetchAppointmentsHistory() {
     showLoading();
     fetch('/api/user/history', {
+
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
+
     .then(response => response.json())
     .then(data => {
       const historyContainer = document.getElementById("appointmentsHistory");
@@ -343,12 +356,14 @@
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
+
       },
       body: JSON.stringify({
         childId: childId,
         vaccineId: vaccineId
       })
     })
+
     .then(response => {
       if (!response.ok) {
         return response.text().then(text => {
@@ -374,6 +389,7 @@
       showAlert(errorMessage, 'error');
     })
     .finally(() => hideLoading());
+
   });
 </script>
 

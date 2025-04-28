@@ -14,4 +14,5 @@ public interface ReactionReportRepository extends JpaRepository<ReactionReport, 
     List<ReactionReport> findByDoctor_DoctorIdAndReportDateBetween(long doctorId, Date startDate, Date endDate);
 
     List<ReactionReport> findByReportDateBetween(Date startDate, Date endDate);
+
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ut.edu.vaccinemanagement.models.ReactionReport;
 import ut.edu.vaccinemanagement.models.User;
+
 import ut.edu.vaccinemanagement.models.Doctor;
 import ut.edu.vaccinemanagement.Repositories.ReactionReportRepository;
 import ut.edu.vaccinemanagement.Repositories.UserRepository;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+
 @Service
 public class ReactionReportService {
 
@@ -23,8 +25,10 @@ public class ReactionReportService {
     @Autowired
     private UserRepository userRepository;
 
+
     @Autowired
     private DoctorRepository doctorRepository;
+
 
     public List<ReactionReport> getReportsByDoctor(long doctorId) {
         return reactionReportRepository.findByDoctor_DoctorId(doctorId);
@@ -41,11 +45,13 @@ public class ReactionReportService {
 
     public ReactionReport reportSymptoms(long userId, ReactionReport report) {
         User user = userRepository.findById(userId).orElse(null);
+
         Doctor doctor = doctorRepository.findById(report.getDoctor().getDoctorId()).orElse(null);
         
         if (user != null && doctor != null) {
             report.setUser(user);
             report.setDoctor(doctor);
+
             return reactionReportRepository.save(report);
         }
         return null;
@@ -54,6 +60,7 @@ public class ReactionReportService {
     public List<ReactionReport> getReportsByUserId(Long userId) {
         return reactionReportRepository.findByUserUserId(userId);
     }
+
 
     public List<ReactionReport> getTodayReports() {
         LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
@@ -65,6 +72,7 @@ public class ReactionReportService {
         );
     }
 
+
     public ReactionReport updateDoctorFeedback(long reactionReportId, String doctorFeedback) throws Exception {
         ReactionReport reactionReport = reactionReportRepository.findById(reactionReportId)
                 .orElseThrow(() -> new Exception("Không tìm thấy báo cáo triệu chứng với ID: " + reactionReportId));
@@ -72,6 +80,7 @@ public class ReactionReportService {
         reactionReport.setDoctorFeedback(doctorFeedback);
         return reactionReportRepository.save(reactionReport);
     }
+
 
     public List<ReactionReport> getReactionReportsForToday(long doctorId) {
         LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
@@ -93,4 +102,5 @@ public class ReactionReportService {
             Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant())
         );
     }
+
 }

@@ -13,7 +13,9 @@ import ut.edu.vaccinemanagement.models.Doctor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import java.util.Calendar;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -48,11 +50,14 @@ public class AppointmentService {
         Vaccine vaccine = vaccineRepository.findById(vaccineId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy vaccine"));
 
+
+
         Doctor doctor = doctorRepository.findById(1L)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bác sĩ với ID 1"));
 
         String appointmentAddress = "Phòng tiêm mặc định";
         String roomNumber = "Phòng 1";
+
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -60,6 +65,7 @@ public class AppointmentService {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         Date appointmentDate = calendar.getTime();
+
 
         Appointment appointment = new Appointment();
         appointment.setUser(user);
@@ -71,7 +77,9 @@ public class AppointmentService {
         appointment.setRoomNumber(roomNumber);
         appointment.setAppointmentStatus(AppointmentStatus.Pending);
 
+
         return appointmentRepository.save(appointment);
+
     }
 
 
@@ -117,8 +125,10 @@ public class AppointmentService {
         return appointmentRepository.findUpcomingAppointmentsByDoctorId(doctorId);
     }
 
+
     public List<Appointment> getAllPendingAppointments(Long doctorId) {
         return appointmentRepository.findByDoctorDoctorIdAndAppointmentStatus(doctorId, AppointmentStatus.Pending);
+
     }
 
     public Appointment updateAppointmentIfPending(Long appointmentId, Date newDate, String newAddress, String newRoom, AppointmentStatus newStatus) throws Exception {

@@ -2,7 +2,9 @@ package ut.edu.vaccinemanagement.models;
 import java.util.Date;
 import jakarta.persistence.*;
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table (name = "Users")
@@ -25,6 +27,7 @@ public class User {
 
     @Column(length = 100, nullable = false, unique = true)
     private String email;
+
 
     @JsonIgnore
     @Column(length = 255, nullable = false)
@@ -55,6 +58,7 @@ public class User {
     private List<ReactionReport> reactionReport;
 
     @JsonIgnore
+
     @OneToMany(mappedBy = "user")
     private List<Notification> notification;
 
@@ -93,42 +97,58 @@ public class User {
         return email;
     }
 
+
     @JsonIgnore
+
     public String getUserPassword() {
         return userPassword;
     }
 
+
     @JsonIgnore
+
     public Wallet getWallet() {
         return wallet;
     }
 
+
     @JsonIgnore
+
     public List<UserChild> getUserChild() {
         return userChild;
     }
 
+
     @JsonIgnore
+
     public List<Appointment> getAppointment() {
         return appointment;
     }
 
+
     @JsonIgnore
+
     public List<Payment> getPayment() {
         return payment;
     }
 
+
     @JsonIgnore
+
     public List<FeedBack> getFeedBack() {
         return feedBack;
     }
 
+
     @JsonIgnore
+
     public List<ReactionReport> getReactionReport() {
         return reactionReport;
     }
 
+
     @JsonIgnore
+
     public List<Notification> getNotification() {
         return notification;
     }

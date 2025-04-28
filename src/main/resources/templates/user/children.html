@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý Trẻ Em</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -96,10 +97,12 @@
 
 <script>
   const token = localStorage.getItem('token');
+
   if (!token) {
     alert("Bạn cần đăng nhập để tiếp tục.");
     window.location.href = "/login";
   }
+
 
   // Hiển thị loading overlay
   function showLoading() {
@@ -120,11 +123,13 @@
     setTimeout(() => alertDiv.classList.add('hidden'), 5000);
   }
 
+
   // Load danh sách trẻ em khi vào trang
   document.addEventListener("DOMContentLoaded", fetchChildren);
 
   // Fetch danh sách
   function fetchChildren() {
+
     showLoading();
     fetch('/api/user/children', {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -248,6 +253,7 @@
     console.log('Adding child with data:', childData);
     showLoading();
     
+
     fetch('/api/user/children/add', {
       method: 'POST',
       headers: {
@@ -256,6 +262,7 @@
       },
       body: JSON.stringify(childData)
     })
+
     .then(res => {
       if (!res.ok) {
         throw new Error('Không thể thêm trẻ');
@@ -418,6 +425,7 @@
     })
     .finally(() => hideLoading());
   });
+
 </script>
 </body>
 </html>

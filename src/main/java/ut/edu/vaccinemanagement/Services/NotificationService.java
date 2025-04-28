@@ -42,6 +42,7 @@ public class NotificationService {
     }
 
     public List<Notification> getUserNotifications(Long userId) {
+
         System.out.println("Fetching notifications for user ID: " + userId);
         List<Notification> notifications = notificationRepository.findByUser_UserId(userId);
         System.out.println("Found " + notifications.size() + " notifications");
@@ -75,6 +76,7 @@ public class NotificationService {
             }
         } else {
             System.out.println("No confirmed appointments found for user ID: " + userId);
+
         }
     }
 }

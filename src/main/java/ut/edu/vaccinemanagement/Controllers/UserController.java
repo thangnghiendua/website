@@ -39,6 +39,7 @@ public class UserController {
         return "user/profile";
     }
 
+
     @GetMapping("/feedback")
     public String showFeedback() {
         return "user/feedback";
@@ -48,4 +49,5 @@ public class UserController {
     public String showSymptomReport() {
         return "user/symptom-report";
     }
+
 }

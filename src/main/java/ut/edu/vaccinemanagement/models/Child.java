@@ -1,6 +1,8 @@
 package ut.edu.vaccinemanagement.models;
 import jakarta.persistence.*;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +24,7 @@ public class Child {
     @Temporal(TemporalType.DATE)
     private Date birthDay;
 
+
     @JsonIgnore
     @OneToMany(mappedBy = "child")
     private List<UserChild> userChild;
@@ -31,6 +34,7 @@ public class Child {
     private List<Appointment> appointment;
 
     @JsonIgnore
+
     @OneToMany(mappedBy = "child")
     private List<ChildVaccine> childVaccine;
 

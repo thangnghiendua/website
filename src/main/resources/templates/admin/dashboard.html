@@ -4,23 +4,28 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <body class="bg-gray-100 min-h-screen">
 
 <!-- Header -->
+
 <header class="bg-blue-600 text-white p-4 shadow flex justify-between items-center">
     <h1 class="text-2xl font-bold">Hệ thống quản lý tiêm chủng - Trang Admin</h1>
     <div class="flex items-center space-x-4">
         <span id="adminName">Admin</span>
         <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600">Đăng xuất</button>
     </div>
+
 </header>
 
 <div class="flex">
     <!-- Sidebar -->
     <aside class="w-64 bg-white shadow h-screen">
         <nav class="flex flex-col p-4 space-y-2">
+
             <button onclick="showSection('dashboard')" class="hover:bg-blue-100 p-2 rounded flex items-center">
                 <i class="fas fa-chart-line w-6"></i>
                 <span>Tổng quan</span>
@@ -33,11 +38,13 @@
                 <i class="fas fa-syringe w-6"></i>
                 <span>Quản lý vaccine</span>
             </button>
+
         </nav>
     </aside>
 
     <!-- Main content -->
     <main class="flex-1 p-6">
+
         <!-- Dashboard -->
         <section id="dashboard" class="space-y-4">
             <h2 class="text-xl font-semibold mb-4">📊 Tổng quan thống kê</h2>
@@ -57,12 +64,14 @@
                 <div class="bg-white p-6 rounded shadow">
                     <h3 class="text-lg font-semibold mb-2">📊 Tổng quan hệ thống</h3>
                     <div id="dashboardSummary" class="space-y-2">Đang tải...</div>
+
                 </div>
             </div>
         </section>
 
         <!-- User management -->
         <section id="users" class="hidden space-y-4">
+
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">👥 Quản lý người dùng</h2>
                 <div class="flex space-x-4 items-center">
@@ -148,11 +157,13 @@
                     </tbody>
                 </table>
             </div>
+
         </section>
 
         <!-- Vaccine management -->
         <section id="vaccines" class="hidden space-y-4">
             <h2 class="text-xl font-semibold mb-4">💉 Quản lý vaccine</h2>
+
             <div class="bg-white p-4 rounded shadow overflow-x-auto">
                 <table class="min-w-full">
                     <thead>
@@ -172,10 +183,12 @@
                 </table>
             </div>
         </section>
+
     </main>
 </div>
 
 <script>
+
     // Kiểm tra đăng nhập
     function checkAuth() {
         const token = localStorage.getItem('token');
@@ -594,6 +607,7 @@
     
     // Load dữ liệu dashboard khi tải trang
     loadDashboardData();
+
 </script>
 </body>
 </html>

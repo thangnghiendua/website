@@ -1,12 +1,16 @@
 package ut.edu.vaccinemanagement.models;
 import jakarta.persistence.*;
+
 import com.fasterxml.jackson.annotation.*;
+
 
 import java.util.Date;
 
 @Entity
 @Table (name = "Notifications")
+
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "notificationId")
+
 public class Notification {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
@@ -17,12 +21,16 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
+
     @JsonIdentityReference(alwaysAsId = true)
+
     private User user;
 
     @OneToOne
     @JoinColumn(name = "appointmentId", nullable = true)
+
     @JsonManagedReference
+
     private Appointment appointment;
 
     @Enumerated(EnumType.STRING)
